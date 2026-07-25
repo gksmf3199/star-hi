@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>별과 우주 탐구 배움터</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Noto Sans KR & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pastel: {
+                            blue: '#E0F2FE',
+                            indigo: '#EEF2FF',
+                            purple: '#F3E8FF',
+                            pink: '#FCE7F3',
+                            sky: '#F0F9FF',
+                            mint: '#ECFDF5',
+                            amber: '#FFFBEB'
+                        },
+                        space: {
+                            dark: '#0F172A',
+                            accent: '#6366F1',
+                            glow: '#A855F7'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Noto Sans KR', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f4ff 0%, #f8fafc 50%, #faeef8 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .active-tab {
+            background-color: #4f46e5 !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.35);
+        }
+        .active-filter {
+            background-color: #6366f1 !important;
+            color: #ffffff !important;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="text-slate-700 flex flex-col min-h-screen">
+
+    <!-- Navigation Bar -->
+    <header class="sticky top-0 z-40 glass-nav shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 sm:h-20">
+                <!-- Logo & Title -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateTo('home')">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-md shadow-indigo-200 transform transition hover:scale-105">
+                        <i class="fa-solid font-bold text-lg sm:text-xl fa-wand-magic-sparkles"></i>
+                    </div>
+                    <div>
+                        <span class="text-lg sm:text-xl font-black text-slate-800 tracking-tight block">별과 우주 <span class="text-xs sm:text-sm font-semibold px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-full ml-1">중3 과학</span></span>
+                        <span class="text-xs text-slate-500 font-medium">탐구 배움터 & 학생 결과물 전시관</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation Links -->
+                <nav class="hidden md:flex space-x-1 lg:space-x-2">
+                    <button id="nav-home" onclick="navigateTo('home')" class="nav-btn px-4 py-2 rounded-xl font-bold text-sm text-slate-600 hover:text-indigo-600 hover:bg-slate-100/80 transition flex items-center space-x-2">
+                        <i class="fa-solid fa-house text-xs"></i>
+                        <span>홈</span>
+                    </button>
+                    <button id="nav-guide" onclick="navigateTo('guide')" class="nav-btn px-4 py-2 rounded-xl font-bold text-sm text-slate-600 hover:text-indigo-600 hover:bg-slate-100/80 transition flex items-center space-x-2">
+                        <i class="fa-solid fa-compass text-xs"></i>
+                        <span>탐구 안내</span>
+                    </button>
+                    <button id="nav-resources" onclick="navigateTo('resources')" class="nav-btn px-4 py-2 rounded-xl font-bold text-sm text-slate-600 hover:text-indigo-600 hover:bg-slate-100/80 transition flex items-center space-x-2">
+                        <i class="fa-solid fa-book-open text-xs"></i>
+                        <span>학습 자료실</span>
+                    </button>
+                    <button id="nav-gallery" onclick="navigateTo('gallery')" class="nav-btn px-4 py-2 rounded-xl font-bold text-sm text-slate-600 hover:text-indigo-600 hover:bg-slate-100/80 transition flex items-center space-x-2">
+                        <i class="fa-solid fa-images text-xs"></i>
+                        <span>학생 탐구 갤러리</span>
+                    </button>
+                    <button id="nav-submit" onclick="navigateTo('submit')" class="nav-btn px-4 py-2 rounded-xl font-bold text-sm text-slate-600 hover:text-indigo-600 hover:bg-slate-100/80 transition flex items-center space-x-2">
+                        <i class="fa-solid fa-paper-plane text-xs"></i>
+                        <span>과제 제출 & Q&A</span>
+                    </button>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button onclick="toggleMobileMenu()" class="p-2 rounded-xl text-slate-600 hover:bg-slate-100 focus:outline-hidden">
+                        <i id="mobile-menu-icon" class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Dropdown Menu -->
+        <div id="mobile-menu" class="hidden md:hidden px-4 pt-2 pb-4 space-y-1 bg-white/95 border-b border-slate-200">
+            <button onclick="navigateTo('home')" class="w-full text-left px-4 py-3 rounded-xl text-sm font-bold text-slate-700 hover:bg-indigo-50">
+                <i class="fa-solid fa-house mr-2 text-indigo-500"></i>홈
+            </button>
+            <button onclick="navigateTo('guide')" class="w-full text-left px-4 py-3 rounded-xl text-sm font-bold text-slate-700 hover:bg-indigo-50">
+                <i class="fa-solid fa-compass mr-2 text-indigo-500"></i>탐구 안내
+            </button>
+            <button onclick="navigateTo('resources')" class="w-full text-left px-4 py-3 rounded-xl text-sm font-bold text-slate-700 hover:bg-indigo-50">
+                <i class="fa-solid fa-book-open mr-2 text-indigo-500"></i>학습 자료실
+            </button>
+            <button onclick="navigateTo('gallery')" class="w-full text-left px-4 py-3 rounded-xl text-sm font-bold text-slate-700 hover:bg-indigo-50">
+                <i class="fa-solid fa-images mr-2 text-indigo-500"></i>학생 탐구 갤러리
+            </button>
+            <button onclick="navigateTo('submit')" class="w-full text-left px-4 py-3 rounded-xl text-sm font-bold text-slate-700 hover:bg-indigo-50">
+                <i class="fa-solid fa-paper-plane mr-2 text-indigo-500"></i>과제 제출 & Q&A
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+
+        <!-- ================= PAGE 1: HOME ================= -->
+        <section id="page-home" class="page-view space-y-10">
+            <!-- Hero Banner -->
+            <div class="relative overflow-hidden rounded-3xl bg-slate-900 text-white shadow-xl p-8 sm:p-12 lg:p-16">
+                <!-- Background Glowing Orbs -->
+                <div class="absolute -top-24 -right-24 w-96 h-96 bg-purple-600/30 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-600/30 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <div class="relative z-10 max-w-3xl space-y-6">
+                    <div class="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs sm:text-sm font-medium text-pink-200">
+                        <i class="fa-solid fa-sparkles text-amber-300"></i>
+                        <span>2026학년도 중3 과학 탐구 프로젝트</span>
+                    </div>
+                    
+                    <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight text-white">
+                        "우리는 어떻게 가지 않고도<br>
+                        <span class="gradient-text bg-gradient-to-r from-sky-300 via-purple-300 to-pink-300">우주를 알 수 있는가?</span>"
+                    </h1>
+                    
+                    <p class="text-slate-300 text-sm sm:text-base lg:text-lg leading-relaxed font-light">
+                        밤하늘 수많은 별의 거리와 밝기부터 우리은하와 우주의 팽창까지!<br class="hidden sm:inline">
+                        직접 수집한 데이터로 나만의 별 포스터를 제작하고 영상 발표회에 참여해 보세요.
+                    </p>
+
+                    <div class="flex flex-wrap gap-4 pt-2">
+                        <button onclick="navigateTo('guide')" class="px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 font-bold text-white shadow-lg shadow-indigo-600/30 transition transform hover:-translate-y-0.5 flex items-center space-x-2 text-sm sm:text-base">
+                            <span>탐구 단계 및 평가 안내</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+                        <button onclick="navigateTo('gallery')" class="px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 font-bold text-white border border-white/30 backdrop-blur-md transition flex items-center space-x-2 text-sm sm:text-base">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                            <span>학생 결과물 둘러보기</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Modules Overview Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div onclick="navigateTo('resources')" class="glass-card p-6 rounded-3xl border border-white/80 shadow-xs hover:shadow-md transition cursor-pointer group hover:-translate-y-1">
+                    <div class="w-12 h-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <i class="fa-solid fa-calculator text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-800 mb-2">연주시차 & 등급 실습</h3>
+                    <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
+                        시리우스, 베가 등의 실제 관측 데이터로 연주시차 및 등급차($m-M$)에 따른 거리 계산을 가상으로 체험하세요.
+                    </p>
+                </div>
+
+                <div onclick="navigateTo('guide')" class="glass-card p-6 rounded-3xl border border-white/80 shadow-xs hover:shadow-md transition cursor-pointer group hover:-translate-y-1">
+                    <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <i class="fa-solid fa-file-video text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-800 mb-2">나만의 별 포스터·영상</h3>
+                    <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
+                        내가 정한 별의 거리와 밝기 특징을 시각적 포스터 및 3분 발표 설명 영상으로 제작해 제출합니다.
+                    </p>
+                </div>
+
+                <div onclick="navigateTo('gallery')" class="glass-card p-6 rounded-3xl border border-white/80 shadow-xs hover:shadow-md transition cursor-pointer group hover:-translate-y-1">
+                    <div class="w-12 h-12 rounded-2xl bg-pink-100 text-pink-600 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <i class="fa-solid fa-users-viewfinder text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-800 mb-2">우주 탐사 영상 발표회</h3>
+                    <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
+                        친구들이 제출한 별 영상들을 함께 감상하며 피드백과 동료 평가를 주고받고 소통합니다.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Notice Board & Quick Info -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Notice List -->
+                <div class="lg:col-span-2 glass-card rounded-3xl p-6 sm:p-8 border border-white/80 shadow-xs space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                                <i class="fa-solid fa-bullhorn text-sm"></i>
+                            </div>
+                            <h3 class="font-bold text-slate-800 text-lg">수업 공지사항</h3>
+                        </div>
+                        <span class="text-xs text-slate-500">최신순</span>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="p-4 rounded-xl bg-white/70 hover:bg-white border border-slate-100 transition shadow-xs">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="px-2 py-0.5 rounded text-xs font-semibold bg-rose-100 text-rose-600">중요</span>
+                                <span class="text-xs text-slate-400">2026.07.20</span>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-sm mb-1">[1단계] 나만의 별 포스터 및 설명 영상 제출 안내</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                각 학생별로 선택한 별의 관측 데이터를 바탕으로 포스터와 발표 영상을 제작하여 '과제 제출' 메뉴에 등록해 주세요. 제출 후 2단계 발표회에서 함께 감상하게 됩니다.
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-white/70 hover:bg-white border border-slate-100 transition shadow-xs">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="px-2 py-0.5 rounded text-xs font-semibold bg-indigo-100 text-indigo-600">공지</span>
+                                <span class="text-xs text-slate-400">2026.07.18</span>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-sm mb-1">학습 자료실 계산 도구 업데이트</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                시리우스, 베가 등 주요 별들의 연주시차 데이터와 겉보기/절대등급 자동 계산기를 자료실에 탑재하였습니다. 포스터 제작 시 활용하세요.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teacher Contact & Schedule Widget -->
+                <div class="glass-card rounded-3xl p-6 sm:p-8 border border-white/80 shadow-xs flex flex-col justify-between space-y-6">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-lg mb-4 flex items-center space-x-2">
+                            <i class="fa-regular fa-calendar-check text-indigo-600"></i>
+                            <span>프로젝트 일정</span>
+                        </h3>
+                        <ul class="space-y-3 text-xs sm:text-sm">
+                            <li class="flex items-center justify-between p-2.5 rounded-lg bg-indigo-50/60">
+                                <span class="font-bold text-slate-700">1단계: 포스터·영상 제작</span>
+                                <span class="text-indigo-600 font-semibold">1주차</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2.5 rounded-lg bg-amber-50/60">
+                                <span class="font-bold text-slate-700">2단계: 영상 발표회 & 평가</span>
+                                <span class="text-amber-600 font-semibold">2주차</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2.5 rounded-lg bg-purple-50/60">
+                                <span class="font-bold text-slate-700">3단계: 은하 & 우주 심화탐구</span>
+                                <span class="text-purple-600 font-semibold">3주차</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">
+                                <i class="fa-solid fa-chalkboard-user"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-xs text-slate-800">과학 탐구지도 교사</h4>
+                                <p class="text-[11px] text-slate-500">질문이 있다면 Q&A 게시판을 활용하세요!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PAGE 2: INQUIRY GUIDE ================= -->
+        <section id="page-guide" class="page-view hidden space-y-8">
+            <!-- Header Section -->
+            <div class="glass-card rounded-3xl p-6 sm:p-8 border border-white/80 shadow-xs space-y-3">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">탐구 프로젝트 가이드</span>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-rose-500 text-white shadow-xs flex items-center space-x-1">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>1~2단계 발표까지 정식 수행평가에 반영됩니다!</span>
+                    </span>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800">별과 우주 탐구 단계 및 평가 안내</h2>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    본 탐구 활동은 3단계로 진행됩니다. <strong class="text-indigo-600">1단계(포스터·영상 제작) 및 2단계(발표회 및 동료 평가)를 통해 핵심 수행평가가 이루어지며</strong>,
+                    평가 종료 후 <strong>3단계(은하 분류 및 우주 팽창 심화 조사)</strong>로 확장 학습을 진행합니다.
+                </p>
+            </div>
+
+            <!-- Step Tabs Buttons -->
+            <div class="flex flex-wrap gap-3">
+                <button id="step-tab-1" onclick="switchStepTab(1)" class="step-tab-btn active-tab px-5 py-3 rounded-2xl font-bold text-sm bg-white text-slate-600 border border-slate-200 transition flex items-center space-x-2">
+                    <span class="w-6 h-6 rounded-full bg-white/30 flex items-center justify-center text-xs">1</span>
+                    <span>1단계: 나만의 별 선정 & 포스터·영상 제작</span>
+                </button>
+                <button id="step-tab-2" onclick="switchStepTab(2)" class="step-tab-btn px-5 py-3 rounded-2xl font-bold text-sm bg-white text-slate-600 border border-slate-200 transition flex items-center space-x-2">
+                    <span class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs">2</span>
+                    <span>2단계: 영상 발표회 & 동료 피드백 (평가)</span>
+                </button>
+                <button id="step-tab-3" onclick="switchStepTab(3)" class="step-tab-btn px-5 py-3 rounded-2xl font-bold text-sm bg-white text-slate-600 border border-slate-200 transition flex items-center space-x-2">
+                    <span class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs">3</span>
+                    <span>3단계: 심화 탐구 - 은하 분류 & 우주 팽창</span>
+                </button>
+            </div>
+
+            <!-- Step Contents -->
+            <div class="glass-card rounded-3xl p-6 sm:p-8 border border-white/80 shadow-xs">
+                <!-- Step 1 Content -->
+                <div id="step-content-1" class="step-content space-y-6">
+                    <div class="flex items-center space-x-3 text-indigo-600">
+                        <i class="fa-solid fa-star text-2xl"></i>
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800">1단계: 별의 특성 탐구 및 [나만의 별 포스터 & 설명 영상] 제작</h3>
+                            <span class="text-xs font-semibold text-rose-600">※ 1단계 평가 항목: 별 데이터 정확성(40%) + 포스터 완성도(30%) + 영상 설명력(30%)</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                        <div class="bg-indigo-50/60 p-5 rounded-2xl border border-indigo-100 space-y-3">
+                            <h4 class="font-bold text-indigo-900 flex items-center space-x-2">
+                                <i class="fa-solid fa-list-check text-indigo-500"></i>
+                                <span>주요 탐구 수행 과정</span>
+                            </h4>
+                            <ul class="list-disc list-inside space-y-2 text-slate-700 text-xs sm:text-sm">
+                                <li><strong>별 1개 정하기:</strong> 밤하늘의 대표적인 별(시리우스, 베가, 아크투르스, 리겔 등) 중 탐구할 별 1개 선택</li>
+                                <li><strong>데이터 수집 및 계산:</strong> 자료실을 활용해 선택한 별의 연주시차($p$), 겉보기 등급($m$), 절대 등급($M$) 조사 및 등급차($m-M$)를 통한 거리가 10pc보다 먼지 가까운지 산출</li>
+                                <li><strong>탐구 포스터 제작:</strong> 별의 위치, 이미지, 등급 비교, 거리 계산 과정을 시각적 포스터(A3 규격 또는 디지털 포스터)로 구성</li>
+                                <li><strong>설명 영상 촬영:</strong> 제작한 포스터를 활용해 별의 거리와 밝기 원리를 2~3분간 직접 발표 설명하는 영상(MP4) 제작</li>
+                            </ul>
+                        </div>
+                        <div class="bg-purple-50/60 p-5 rounded-2xl border border-purple-100 space-y-3">
+                            <h4 class="font-bold text-purple-900 flex items-center space-x-2">
+                                <i class="fa-solid fa-flag text-purple-500"></i>
+                                <span>최종 제출물 (과제 제출 탭)</span>
+                            </h4>
+                            <ul class="list-disc list-inside space-y-2 text-slate-700 text-xs sm:text-sm">
+                                <li><strong>1. 나만의 별 탐구 포스터</strong> (PDF 또는 이미지 파일)</li>
+                                <li><strong>2. 포스터 설명 영상 파일/링크</strong> (학생이 포스터를 발표하는 3분 이내 녹화 영상)</li>
+                                <li><strong>제출 기한:</strong> 프로젝트 1주차 주말까지 제출 완료</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 Content: Video Presentation & Peer Feedback -->
+                <div id="step-content-2" class="step-content hidden space-y-6">
+                    <div class="flex items-center space-x-3 text-amber-600">
+                        <i class="fa-solid fa-circle-play text-2xl"></i>
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800">2단계: [우주 탐사 영상 발표회] 상영 및 동료 평가</h3>
+                            <span class="text-xs font-semibold text-rose-600">※ 2단계 평가 항목: 발표 전달력 + 동료 피드백 및 성찰 평가</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                        <div class="bg-amber-50/60 p-5 rounded-2xl border border-amber-100 space-y-3">
+                            <h4 class="font-bold text-amber-900 flex items-center space-x-2">
+                                <i class="fa-solid fa-list-check text-amber-500"></i>
+                                <span>발표회 활동 내용</span>
+                            </h4>
+                            <ul class="list-disc list-inside space-y-1.5 text-slate-700 text-xs sm:text-sm">
+                                <li>제출된 학생별 '별 포스터 설명 영상' 상영 및 전원 시청</li>
+                                <li>친구들이 제출한 영상과 포스터의 거리 계산 및 시차 설명 검토</li>
+                                <li>[학생 탐구 갤러리]에서 다른 학생 결과물에 좋아요 및 피드백 댓글 작성</li>
+                            </ul>
+                        </div>
+                        <div class="bg-emerald-50/60 p-5 rounded-2xl border border-emerald-100 space-y-3">
+                            <h4 class="font-bold text-emerald-900 flex items-center space-x-2">
+                                <i class="fa-solid fa-flag text-emerald-500"></i>
+                                <span>평가 및 성찰</span>
+                            </h4>
+                            <ul class="list-disc list-inside space-y-1.5 text-slate-700 text-xs sm:text-sm">
+                                <li>동료 평가표 제출 및 개인 배움 성찰록 작성</li>
+                                <li>우수 영상 포스터 갤러리 랭킹 선정 및 소정의 상장 수여</li>
+                                <li>일정: 프로젝트 2주차 과학 수업시간</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3 Content: Extended Inquiry on Galaxies & Universe Expansion -->
+                <div id="step-content-3" class="step-content hidden space-y-6">
+                    <div class="flex items-center space-x-3 text-purple-600">
+                        <i class="fa-solid fa-globe text-2xl"></i>
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800">3단계: [심화 탐구] 우리은하·외부은하 분류 및 우주 팽창 추가 조사</h3>
+                            <span class="text-xs font-semibold text-purple-700">※ 평가 완료 후 진행되는 우주 과학 지평 확장 프로젝트</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                        <div class="bg-purple-50/60 p-5 rounded-2xl border border-purple-100 space-y-3">
+                            <h4 class="font-bold text-purple-900 flex items-center space-x-2">
+                                <i class="fa-solid fa-list-check text-purple-500"></i>
+                                <span>추가 조사 및 실험 주제</span>
+                            </h4>
+                            <ul class="list-disc list-inside space-y-1.5 text-slate-700 text-xs sm:text-sm">
+                                <li>허블의 은하 분류 기준(타원은하, 나선은하, 불규칙은하) 및 특징 조사</li>
+                                <li>풍선 모형을 이용한 우주 팽창 실험 관찰 및 은하 간 후퇴 속도 비교</li>
+                                <li>우주 배경 복사와 빅뱅 우주론의 창시 및 현대 우주 탐사선(JWST 등) 신기술 조사</li>
+                            </ul>
+                        </div>
+                        <div class="bg-pink-50/60 p-5 rounded-2xl border border-pink-100 space-y-3">
+                            <h4 class="font-bold text-pink-900 flex items-center space-x-2">
+                                <i class="fa-solid fa-flag text-pink-500"></i>
+                                <span>심화 탐구 산출물</span>
+                            </h4>
+                            <ul class="list-disc list-inside space-y-1.5 text-slate-700 text-xs sm:text-sm">
+                                <li>우주 팽창 풍선 실험 사진 및 결과 보고서</li>
+                                <li>은하 분류 카드뉴스 또는 우주 탐사 인포그래픽 자율 제출</li>
+                                <li>기간: 발표 평가 이후 3주차 탐구 주간</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evaluation Criteria Table -->
+            <div class="glass-card rounded-3xl p-6 sm:p-8 border border-white/80 shadow-xs space-y-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-award text-amber-500 text-xl"></i>
+                    <h3 class="text-xl font-bold text-slate-800">평가 기준표 (루브릭)</h3>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                        <thead>
+                            <tr class="bg-indigo-50/80 text-indigo-900 border-b border-indigo-100">
+                                <th class="p-3 font-bold rounded-tl-xl">평가 단계 및 항목</th>
+                                <th class="p-3 font-bold">우수 (A)</th>
+                                <th class="p-3 font-bold">보통 (B)</th>
+                                <th class="p-3 font-bold rounded-tr-xl">노력 요함 (C)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-slate-700">
+                            <tr>
+                                <td class="p-3 font-semibold bg-slate-50/50">별 데이터 분석 (1단계)</td>
+                                <td class="p-3">선택한 별의 연주시차, 겉보기/절대등급, $m-M$ 등급차를 통한 거리를 완벽히 계산함</td>
+                                <td class="p-3">별의 기본 데이터는 조사했으나 등급차와 거리 계산 과정에 약간의 오류가 있음</td>
+                                <td class="p-3">연주시차 및 등급 개념 이해가 미흡하고 조사가 불완전함</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-semibold bg-slate-50/50">포스터 시각화 (1단계)</td>
+                                <td class="p-3">별의 관측 이미지, 등급 비교 그래프, 거리 계산식이 가독성 높게 완성됨</td>
+                                <td class="p-3">포스터의 기본 형식을 갖추었으나 시각적 구성이나 도표 전달력이 다소 아쉬움</td>
+                                <td class="p-3">내용 표기가 누락되었거나 포스터 형태를 갖추지 못함</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-semibold bg-slate-50/50">설명 영상 및 발표 (2단계)</td>
+                                <td class="p-3">포스터를 바탕으로 가지 않고도 거리를 구하는 원리를 3분 내로 명확하게 발표함</td>
+                                <td class="p-3">영상의 교안 전달이 가능하나 말하기 속도나 시선 처리가 다소 어색함</td>
+                                <td class="p-3">영상 분량이 기준 미달이거나 포스터 설명 내용이 불분명함</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-semibold bg-slate-50/50">은하&우주 심화 탐구 (3단계)</td>
+                                <td class="p-3">은하 분류 기준과 우주 팽창 실험 원리를 주도적이고 창의적으로 파악 및 정리함</td>
+                                <td class="p-3">은하 형태 분류와 우주 팽창 개념을 대략적으로 이해함</td>
+                                <td class="p-3">은하 분류 및 우주 팽창에 대한 참여가 부족함</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PAGE 3: RESOURCE CENTER ================= -->
+        <section id="page-resources" class="page-view hidden space-y-8">
+            <div class="glass-card rounded-3xl p-6 sm:p-8 border border-white/80 shadow-xs space-y-2">
+                <span class="px-3 py-1 rounded-full text-xs font-semibold bg-sky-100 text-sky-700">탐구 실습 및 데이터 자료실</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800">별의 연주시차 & 등급·거리 계산 탐구 활동</h2>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    지구에서 직접 가지 않고도 별까지의 거리와 실제 밝기를 알아내는 원리를 데이터 카드와 시뮬레이터로 직접 확인해 보세요.
+                </p>
+            </div>
+
+            <!-- Activity 1: Star Parallax & Magnitude Interactive Data Table -->
+            <div class="glass-card rounded-3xl p-6 sm:p-8 border border-white/80 shadow-xs space-y-6">
+                <div class="flex items-center space-x-3 text-indigo-600">
+                    <i class="fa-solid fa-star-half-stroke text-2xl"></i>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800">[활동 1] 주요 대표 별의 연주시차 & 등급 관측 데이터 비교</h3>
+                        <p class="text-xs text-slate-500">별을 클릭하면 해당 별의 연주시차($p$)와 겉보기/절대 등급, 등급차($m-M$) 데이터를 분석합니다.</p>
+                    </div>
+                </div>
+
+                <!-- Star Selector Buttons -->
+                <div class="flex flex-wrap gap-2" id="star-btn-container">
+                    <!-- Dynamic button injection -->
+                </div>
+
+                <!-- Active Star Detail Card -->
+                <div id="star-detail-card" class="bg-gradient-to-r from-slate-900 to-indigo-950 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden transition-all duration-300">
+                    <div class="absolute top-0 right-0 p-8 opacity-10 pointer-events-none text-9xl">
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
+                        <div class="space-y-3 lg:border-r lg:border-slate-800 lg:pr-6">
+                            <span id="star-constellation" class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/30 text-indigo-200 border border-indigo-400/30">큰개자리</span>
+                            <h4 id="star-name" class="text-3xl font-black text-white tracking-tight">시리우스 (Sirius)</h4>
+                            <p id="star-desc" class="text-xs text-slate-300 leading-relaxed">밤하늘에서 가장 밝게 보이는 별 중 하나입니다.</p>
+                            <div class="pt-2">
+                                <span class="text-xs text-slate-400 block mb-1">실제 거리</span>
+                                <span id="star-distance" class="text-2xl font-extrabold text-amber-300">2.64 pc (8.6 광년)</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 lg:col-span-2">
+                            <div class="bg-white/5 p-4 rounded-2xl border border-white/10 space-y-1">
+                                <span class="text-xs text-slate-400">연주시차 ($p$)</span>
+                                <div id="star-parallax" class="text-xl font-bold text-sky-300">0.379″</div>
+                                <p class="text-[11px] text-slate-400">$d(pc) = 1 / p(\text{초})$</p>
+                            </div>
+
+                            <div class="bg-white/5 p-4 rounded-2xl border border-white/10 space-y-1">
+                                <span class="text-xs text-slate-400">겉보기 등급 ($m$)</span>
+                                <div id="star-apparent" class="text-xl font-bold text-pink-300">-1.46 등급</div>
+                                <p class="text-[11px] text-slate-400">우리 눈에 보이는 밝기</p>
+                            </div>
+
+                            <div class="bg-white/5 p-4 rounded-2xl border border-white/10 space-y-1">
+                                <span class="text-xs text-slate-400">절대 등급 ($M$)</span>
+                                <div id="star-absolute" class="text-xl font-bold text-purple-300">+1.43 등급</div>
+                                <p class="text-[11px] text-slate-400">10pc 거리에서의 진짜 밝기</p>
+                            </div>
+
+                            <div class="bg-white/5 p-4 rounded-2xl border border-white/10 space-y-1">
+                                <span class="text-xs text-slate-400">등급차 ($m - M$) & 10pc 비교</span>
+                                <div id="star-diff" class="text-xl font-bold text-emerald-300">-2.89 (< 0)</div>
+                                <p id="star-10pc-status" class="text-[11px] text-emerald-400">10pc 보다 가깝다!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity 2: Interactive Distance & Magnitude Calculator -->
+            <div class="glass-card rounded-3xl p-6 sm:p-8 border border-white/80 shadow-xs space-y-6">
+                <div class="flex items-center space-x-3 text-purple-600">
+                    <i class="fa-solid fa-calculator text-2xl"></i>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800">[활동 2] 등급차($m-M$)를 활용한 별의 거리 판단 실습 계산기</h3>
+                        <p class="text-xs text-slate-500">겉보기 등급($m$)과 절대 등급($M$)을 직접 설정하여 별의 위치와 거리 범위를 판별해 보세요.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-indigo-50/40 p-6 rounded-2xl border border-indigo-100">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">겉보기 등급 ($m$): <span id="m-val" class="text-indigo-600 font-extrabold">+1.0</span></label>
+                            <input type="range" id="input-m" min="-5" max="15" step="0.5" value="1.0" oninput="calculateDistanceRule()" class="w-full accent-indigo-600 cursor-pointer">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">절대 등급 ($M$): <span id="M-val" class="text-purple-600 font-extrabold">+3.0</span></label>
+                            <input type="range" id="input-M" min="-5" max="15" step="0.5" value="3.0" oninput="calculateDistanceRule()" class="w-full accent-purple-600 cursor-pointer">
+                        </div>
+
+                        <div class="p-3 bg-white rounded-xl border border-slate-200 text-xs space-y-1">
+                            <div class="flex justify-between font-bold">
+                                <span>등급차 ($m - M$):</span>
+                                <span id="diff-val" class="text-rose-600">-2.0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div id="calc-result-box" class="p-5 rounded-2xl bg-white border border-indigo-200 shadow-xs space-y-2">
+                            <span class="text-xs font-bold text-indigo-500 uppercase tracking-wider block">계산 분석 결과</span>
+                            <div id="calc-headline" class="text-lg font-black text-slate-800">10 pc 보다 가까운 별</div>
+                            <p id="calc-explain" class="text-xs text-slate-600 leading-relaxed">
+                                $m - M < 0$ 이므로 겉보기 등급이 절대 등급보다 더 밝게 보입니다. 즉, 이 별은 기준 거리인 10pc(약 32.6광년)보다 지구에 가까이 위치해 있습니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity 3: Distance & Brightness Inverse-Square Law Simulation -->
+            <div class="glass-card rounded-3xl p-6 sm:p-8 border border-white/80 shadow-xs space-y-6">
+                <div class="flex items-center space-x-3 text-amber-600">
+                    <i class="fa-solid fa-lightbulb text-2xl"></i>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800">[활동 3] 별의 거리와 밝기 관계 (역제곱 법칙 체험)</h3>
+                        <p class="text-xs text-slate-500">별의 거리가 2배, 3배 멀어짐에 따라 눈에 보이는 밝기가 어떻게 줄어드는지 관찰해 보세요.</p>
+                    </div>
+                </div>
+
+                <div class="p-6 rounded-2xl bg-slate-900 text-white space-y-6">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">별까지의 상대 거리 ($r$)</label>
+                            <input type="range" id="sim-distance" min="1" max="5" step="1" value="1" oninput="updateBrightnessSim()" class="w-64 accent-amber-400 cursor-pointer">
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs text-slate-400 block">상대 밝기</span>
+                            <span id="sim-brightness-text" class="text-2xl font-black text-amber-300">100 % ($1 / 1^2$)</span>
+                        </div>
+                    </div>
+
+                    <!-- Visual Light Container -->
+                    <div class="h-32 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center relative overflow-hidden">
+                        <div id="sim-star-glow" class="rounded-full bg-amber-300 shadow-[0_0_80px_40px_rgba(252,211,77,0.8)] transition-all duration-300" style="width: 80px; height: 80px;"></div>
+                    </div>
+
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        💡 <strong>과학 원리:</strong> 별의 밝기는 거리의 제곱에 반비례합니다 ($\text{밝기} \propto \frac{1}{r^2}$). 거리가 2배 멀어지면 밝기는 $\frac{1}{4}$ (25%)로 어두워지며, 5등급 차이는 밝기 100배 차이에 해당합니다.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PAGE 4: STUDENT GALLERY ================= -->
+        <section id="page-gallery" class="page-view hidden space-y-8">
+            <div class="glass-card rounded-3xl p-6 sm:p-8 border border-white/80 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-pink-100 text-pink-700">탐구 결과물 전시관</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mt-1">학생 탐구 갤러리</h2>
+                    <p class="text-sm text-slate-600">친구들이 제출한 '나만의 별 포스터' 및 설명 영상을 감상하고 피드백을 나눠보세요.</p>
+                </div>
+
+                <!-- Search Input -->
+                <div class="relative w-full md:w-72">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+                    <input type="text" id="gallery-search" oninput="filterGallery()" placeholder="별 이름, 학생 이름, 모둠 검색..." class="w-full pl-9 pr-4 py-2.5 rounded-xl text-xs bg-white/80 border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 transition">
+                </div>
+            </div>
+
+            <!-- Group Filter Buttons -->
+            <div class="flex flex-wrap gap-2" id="group-filter-buttons">
+                <button onclick="setFilter('all')" class="filter-btn active-filter px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200 transition">전체 보기</button>
+                <button onclick="setFilter('1모둠')" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200 transition">1모둠</button>
+                <button onclick="setFilter('2모둠')" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200 transition">2모둠</button>
+                <button onclick="setFilter('3모둠')" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200 transition">3모둠</button>
+                <button onclick="setFilter('4모둠')" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200 transition">4모둠</button>
+                <button onclick="setFilter('5모둠')" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200 transition">5모둠</button>
+                <button onclick="setFilter('6모둠')" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200 transition">6모둠</button>
+            </div>
+
+            <!-- Gallery Cards Grid -->
+            <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Dynamic cards populated via JavaScript -->
+            </div>
+        </section>
+
+        <!-- ================= PAGE 5: SUBMISSION & Q&A ================= -->
+        <section id="page-submit" class="page-view hidden space-y-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Submission Form -->
+                <div class="glass-card rounded-3xl p-6 sm:p-8 border border-white/80 shadow-xs space-y-6">
+                    <div class="border-b border-slate-200 pb-4">
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">1단계 과제 제출</span>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-800 mt-2">나만의 별 포스터 & 영상 등록</h2>
+                        <p class="text-xs text-slate-500 mt-1">제출 후 [학생 탐구 갤러리]에 실시간으로 등록됩니다.</p>
+                    </div>
+
+                    <form id="submission-form" onsubmit="handleFormSubmit(event)" class="space-y-4 text-xs sm:text-sm">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">소속 모둠</label>
+                                <select id="sub-group" required class="w-full p-3 rounded-xl bg-white border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-hidden">
+                                    <option value="1모둠">1모둠</option>
+                                    <option value="2모둠">2모둠</option>
+                                    <option value="3모둠">3모둠</option>
+                                    <option value="4모둠">4모둠</option>
+                                    <option value="5모둠">5모둠</option>
+                                    <option value="6모둠">6모둠</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">학생 이름 (또는 모둠원)</label>
+                                <input type="text" id="sub-author" required placeholder="예: 김과학, 이우주" class="w-full p-3 rounded-xl bg-white border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-hidden">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">탐구한 별 이름 및 프로젝트 제목</label>
+                            <input type="text" id="sub-title" required placeholder="예: [시리우스] 밤하늘에서 가장 빛나는 별의 거리 계산" class="w-full p-3 rounded-xl bg-white border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-hidden">
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">탐구 핵심 설명 (포스터 주요 내용)</label>
+                            <textarea id="sub-desc" rows="3" required placeholder="선택한 별의 연주시차, 겉보기/절대등급, 거리를 계산한 핵심 요약을 적어주세요." class="w-full p-3 rounded-xl bg-white border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-hidden resize-none"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">발표 영상 웹 링크 (유튜브/구글드라이브 등)</label>
+                            <input type="url" id="sub-link" placeholder="https://..." class="w-full p-3 rounded-xl bg-white border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-hidden">
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-500">
+                            <i class="fa-solid fa-circle-info text-indigo-500 mr-1"></i>
+                            이미지 및 포스터는 제출 완료 시 샘플 그래픽으로 자동 가공되어 갤러리에 업로드됩니다.
+                        </div>
+
+                        <button type="submit" class="w-full py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 font-bold text-white transition shadow-md shadow-indigo-200 flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            <span>과제 제출하기</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Q&A Board Section -->
+                <div class="glass-card rounded-3xl p-6 sm:p-8 border border-white/80 shadow-xs space-y-6">
+                    <div class="border-b border-slate-200 pb-4 flex justify-between items-center">
+                        <div>
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">질문과 답변</span>
+                            <h2 class="text-xl sm:text-2xl font-bold text-slate-800 mt-2">탐구 Q&A 게시판</h2>
+                        </div>
+                    </div>
+
+                    <!-- Question Form -->
+                    <form id="qna-form" onsubmit="handleQnaSubmit(event)" class="space-y-3">
+                        <input type="text" id="qna-author" required placeholder="작성자 이름" class="w-full p-2.5 rounded-xl text-xs bg-white border border-slate-200 outline-hidden">
+                        <textarea id="qna-content" rows="2" required placeholder="별의 거리 계산, 연주시차 등 궁금한 질문을 남겨주세요." class="w-full p-2.5 rounded-xl text-xs bg-white border border-slate-200 outline-hidden resize-none"></textarea>
+                        <button type="submit" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 font-bold text-white text-xs transition">질문 등록</button>
+                    </form>
+
+                    <!-- Q&A List -->
+                    <div id="qna-list" class="space-y-3 custom-scrollbar max-h-80 overflow-y-auto pr-1">
+                        <!-- Dynamic Q&A items -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Gallery Detail Modal -->
+    <div id="gallery-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-5 shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <button onclick="closeModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="space-y-1">
+                <span id="modal-group" class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">1모둠</span>
+                <h3 id="modal-title" class="text-xl font-bold text-slate-800 pt-1">프로젝트 제목</h3>
+                <p id="modal-author" class="text-xs text-slate-500">작성자: 김과학</p>
+            </div>
+
+            <!-- Modal Image Graphic -->
+            <div id="modal-img-container" class="h-56 sm:h-64 rounded-2xl bg-slate-900 flex items-center justify-center text-white p-6 relative overflow-hidden">
+                <!-- Visual Content Inside Modal -->
+            </div>
+
+            <div class="space-y-2">
+                <h4 class="font-bold text-sm text-slate-800">탐구 내용 설명</h4>
+                <p id="modal-desc" class="text-xs sm:text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    탐구 설명글이 여기에 표시됩니다.
+                </p>
+            </div>
+
+            <!-- Video Link & Action -->
+            <div id="modal-video-box" class="p-3 bg-indigo-50 rounded-xl border border-indigo-100 flex items-center justify-between text-xs">
+                <span class="font-semibold text-indigo-900"><i class="fa-solid fa-video mr-1"></i> 포스터 설명 발표 영상</span>
+                <a id="modal-video-link" href="#" target="_blank" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition">영상 보기</a>
+            </div>
+
+            <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+                <button id="modal-like-btn" onclick="likeActiveModalItem()" class="px-4 py-2 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-600 font-bold text-xs transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-heart"></i>
+                    <span id="modal-likes-count">좋아요 0</span>
+                </button>
+                <button onclick="closeModal()" class="px-5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-xs text-slate-700 transition">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-8 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 space-y-2">
+            <p class="font-semibold text-slate-700">별과 우주 탐구 배움터 - 중학교 3학년 과학 프로젝트</p>
+            <p>본 사이트는 학생들의 우주 과학 탐구 수행평가 및 결과물 공유를 지원하는 교육용 웹 애플리케이션입니다.</p>
+            <p class="text-[11px] text-slate-400">© 2026 Science Class. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // ================= STAR DATASET =================
+        const STAR_DATA = [
+            {
+                id: 'sirius',
+                name: '시리우스 (Sirius)',
+                constellation: '큰개자리',
+                desc: '밤하늘에서 가장 밝게 보이는 별 중 하나로, 지구에서 매우 가깝습니다.',
+                parallax: 0.379,
+                apparent: -1.46,
+                absolute: 1.43,
+                distancePc: '2.64 pc (8.6 광년)'
+            },
+            {
+                id: 'vega',
+                name: '베가 (Vega / 직녀성)',
+                constellation: '거문고자리',
+                desc: '여름철 대삼각형을 이루는 매우 밝은 청백색 별입니다.',
+                parallax: 0.129,
+                apparent: 0.03,
+                absolute: 0.58,
+                distancePc: '7.75 pc (25.3 광년)'
+            },
+            {
+                id: 'arcturus',
+                name: '아크투르스 (Arcturus)',
+                constellation: '목동자리',
+                desc: '봄철 대곡선의 끝자락에 위치한 주황색 거성입니다.',
+                parallax: 0.088,
+                apparent: -0.05,
+                absolute: -0.30,
+                distancePc: '11.36 pc (36.7 광년)'
+            },
+            {
+                id: 'procyon',
+                name: '프로키온 (Procyon)',
+                constellation: '작은개자리',
+                desc: '겨울철 대삼각형의 한 축을 담당하는 가까운 황백색 별입니다.',
+                parallax: 0.286,
+                apparent: 0.34,
+                absolute: 2.66,
+                distancePc: '3.50 pc (11.4 광년)'
+            },
+            {
+                id: 'rigel',
+                name: '리겔 (Rigel)',
+                constellation: '오리온자리',
+                desc: '오리온자리의 발에 해당하는 매우 밝은 청색 초거성입니다.',
+                parallax: 0.0038,
+                apparent: 0.13,
+                absolute: -7.84,
+                distancePc: '260 pc (860 광년)'
+            }
+        ];
+
+        // ================= INITIAL GALLERY SAMPLE DATA =================
+        let galleryItems = [
+            {
+                id: 1,
+                group: '1모둠',
+                author: '김별, 이우주',
+                title: '[시리우스] 밤하늘의 시리우스 거리와 밝기 분석',
+                desc: '연주시차가 0.379″로 측정되어 거리가 약 2.64pc로 매우 가깝습니다. 등급차(m-M = -2.89)가 음수이므로 10pc보다 훨씬 가까운 위치에 있음을 확인했습니다.',
+                likes: 12,
+                videoUrl: 'https://www.youtube.com',
+                bgGradient: 'from-blue-600 to-indigo-900',
+                starIcon: 'fa-star'
+            },
+            {
+                id: 2,
+                group: '2모둠',
+                author: '박은하, 최태양',
+                title: '[베가] 직녀성 베가의 등급과 광도 비교',
+                desc: '거문고자리의 베가는 겉보기 등급과 절대 등급의 차이가 크지 않아 약 7.75pc 거리에 존재합니다. A형 주계열성으로 표면온도가 매우 높습니다.',
+                likes: 9,
+                videoUrl: 'https://www.youtube.com',
+                bgGradient: 'from-purple-600 to-pink-900',
+                starIcon: 'fa-sun'
+            },
+            {
+                id: 3,
+                group: '3모둠',
+                author: '정성운, 강혜성',
+                title: '[아크투르스] 목동자리 주황색 거성의 거리 산출',
+                desc: '아크투르스는 연주시차가 약 0.088″로 10pc(약 11.36pc)보다 먼 별입니다. absolute magnitude가 -0.30으로 실제 발광량이 매우 큽니다.',
+                likes: 15,
+                videoUrl: 'https://www.youtube.com',
+                bgGradient: 'from-amber-600 to-red-900',
+                starIcon: 'fa-meteor'
+            },
+            {
+                id: 4,
+                group: '4모둠',
+                author: '윤블랙, 임홀',
+                title: '[리겔] 멀리 있지만 밝게 보이는 청색 초거성 리겔',
+                desc: '리겔의 연주시차는 0.0038″로 매우 작아 거리가 260pc에 달합니다. 하지만 절대 등급이 -7.84에 달할 정도로 엄청난 빛을 내뿜고 있습니다.',
+                likes: 18,
+                videoUrl: 'https://www.youtube.com',
+                bgGradient: 'from-sky-500 to-blue-900',
+                starIcon: 'fa-globe'
+            },
+            {
+                id: 5,
+                group: '5모둠',
+                author: '한빛, 송우주',
+                title: '[프로키온] 작은개자리 프로키온의 겉보기 등급 탐구',
+                desc: '프로키온은 연주시차가 0.286″로 3.5pc 거리에 있습니다. 겉보기 등급 0.34로 밤하늘에서 손꼽히게 밝게 보입니다.',
+                likes: 7,
+                videoUrl: 'https://www.youtube.com',
+                bgGradient: 'from-emerald-600 to-teal-900',
+                starIcon: 'fa-certificate'
+            },
+            {
+                id: 6,
+                group: '6모둠',
+                author: '오은하, 장스타',
+                title: '[알데바란] 황소자리 알데바란 거성의 특성',
+                desc: '알데바란의 등급차 분석 결과 지구에서 약 20pc 떨어진 거리로 10pc 기준보다 먼 위치임을 검증하였습니다.',
+                likes: 11,
+                videoUrl: 'https://www.youtube.com',
+                bgGradient: 'from-rose-600 to-purple-900',
+                starIcon: 'fa-sparkles'
+            }
+        ];
+
+        // ================= Q&A SAMPLE DATA =================
+        let qnaItems = [
+            {
+                id: 1,
+                author: '이우주',
+                question: '연주시차가 0.1″보다 작은 별은 거리를 어떻게 구하나요?',
+                answer: '연주시차가 너무 작으면 지상 망원경으로는 오차가 커져서, 히파르코스나 가이아(GAIA) 같은 우주 망원경을 사용해 더 정밀하게 측정합니다!'
+            },
+            {
+                id: 2,
+                author: '김과학',
+                question: '절대 등급이 음수(-)이면 무슨 뜻인가요?',
+                answer: '등급 수치가 낮거나 음수일수록 밝은 별을 의미합니다! 따라서 절대 등급이 음수라는 것은 실제 발광 에너지가 엄청나게 큰 밝은 별이라는 뜻입니다.'
+            }
+        ];
+
+        let activeFilter = 'all';
+        let currentModalItemId = null;
+
+        // Navigation Logic
+        function navigateTo(pageId) {
+            document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
+            const targetPage = document.getElementById(`page-${pageId}`);
+            if(targetPage) targetPage.classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('text-indigo-600', 'bg-indigo-50'));
+            const activeNav = document.getElementById(`nav-${pageId}`);
+            if(activeNav) activeNav.classList.add('text-indigo-600', 'bg-indigo-50');
+
+            // Close mobile menu if open
+            document.getElementById('mobile-menu').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Inquiry Step Tabs Logic
+        function switchStepTab(stepNum) {
+            document.querySelectorAll('.step-tab-btn').forEach(btn => {
+                btn.classList.remove('active-tab');
+            });
+            document.querySelectorAll('.step-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            document.getElementById(`step-tab-${stepNum}`).classList.add('active-tab');
+            document.getElementById(`step-content-${stepNum}`).classList.remove('hidden');
+        }
+
+        // Render Star Buttons in Resource Page
+        function renderStarButtons() {
+            const container = document.getElementById('star-btn-container');
+            if(!container) return;
+            container.innerHTML = STAR_DATA.map((star, idx) => `
+                <button onclick="selectStar('${star.id}')" class="star-select-btn px-4 py-2 rounded-xl text-xs font-bold transition border ${idx === 0 ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'}">
+                    ${star.name}
+                </button>
+            `).join('');
+        }
+
+        function selectStar(starId) {
+            const star = STAR_DATA.find(s => s.id === starId);
+            if(!star) return;
+
+            // Update UI buttons
+            document.querySelectorAll('.star-select-btn').forEach(btn => {
+                if(btn.textContent.includes(star.name.split(' ')[0])) {
+                    btn.className = 'star-select-btn px-4 py-2 rounded-xl text-xs font-bold transition border bg-indigo-600 text-white border-indigo-600 shadow-xs';
+                } else {
+                    btn.className = 'star-select-btn px-4 py-2 rounded-xl text-xs font-bold transition border bg-white text-slate-700 border-slate-200 hover:bg-slate-50';
+                }
+            });
+
+            // Update Card Details
+            document.getElementById('star-name').textContent = star.name;
+            document.getElementById('star-constellation').textContent = star.constellation;
+            document.getElementById('star-desc').textContent = star.desc;
+            document.getElementById('star-distance').textContent = star.distancePc;
+            document.getElementById('star-parallax').textContent = `${star.parallax}″`;
+            document.getElementById('star-apparent').textContent = `${star.apparent} 등급`;
+            document.getElementById('star-absolute').textContent = `${star.absolute} 등급`;
+
+            const diff = (star.apparent - star.absolute).toFixed(2);
+            document.getElementById('star-diff').textContent = `${diff} (${diff < 0 ? '< 0' : '> 0'})`;
+            
+            const statusEl = document.getElementById('star-10pc-status');
+            if(diff < 0) {
+                statusEl.textContent = '10 pc 보다 가까운 별입니다.';
+                statusEl.className = 'text-[11px] text-emerald-400 font-bold';
+            } else {
+                statusEl.textContent = '10 pc 보다 먼 별입니다.';
+                statusEl.className = 'text-[11px] text-rose-400 font-bold';
+            }
+        }
+
+        // Activity 2: Interactive Calculator Logic
+        function calculateDistanceRule() {
+            const m = parseFloat(document.getElementById('input-m').value);
+            const M = parseFloat(document.getElementById('input-M').value);
+
+            document.getElementById('m-val').textContent = m > 0 ? `+${m}` : `${m}`;
+            document.getElementById('M-val').textContent = M > 0 ? `+${M}` : `${M}`;
+
+            const diff = (m - M).toFixed(1);
+            document.getElementById('diff-val').textContent = diff > 0 ? `+${diff}` : `${diff}`;
+
+            const headline = document.getElementById('calc-headline');
+            const explain = document.getElementById('calc-explain');
+
+            if (diff < 0) {
+                headline.textContent = "10 pc (32.6광년) 보다 가까운 별";
+                headline.className = "text-lg font-black text-emerald-600";
+                explain.innerHTML = `겉보기 등급($m$)이 절대 등급($M$)보다 더 밝게 측정됩니다 ($m - M < 0$). 이는 별이 기준 거리인 10pc보다 <strong>지구에 가까이 위치</strong>해 원래보다 더 밝게 보임을 뜻합니다.`;
+            } else if (diff > 0) {
+                headline.textContent = "10 pc (32.6광년) 보다 먼 별";
+                headline.className = "text-lg font-black text-rose-600";
+                explain.innerHTML = `겉보기 등급($m$)이 절대 등급($M$)보다 어둡게 측정됩니다 ($m - M > 0$). 이는 별이 기준 거리인 10pc보다 <strong>멀리 떨어져 있어서</strong> 원래 밝기보다 어둡게 보임을 의미합니다.`;
+            } else {
+                headline.textContent = "정확히 10 pc 거리에 위치한 별";
+                headline.className = "text-lg font-black text-indigo-600";
+                explain.innerHTML = `겉보기 등급과 절대 등급이 완벽히 일치합니다 ($m - M = 0$). 별이 정확히 10pc 거리에 있습니다.`;
+            }
+        }
+
+        // Activity 3: Brightness Simulator Logic
+        function updateBrightnessSim() {
+            const r = parseInt(document.getElementById('sim-distance').value);
+            const brightnessPercent = Math.round(100 / (r * r));
+            
+            document.getElementById('sim-brightness-text').textContent = `${brightnessPercent}% (1 / ${r}²)`;
+            
+            const glow = document.getElementById('sim-star-glow');
+            const size = Math.max(20, 90 / r);
+            glow.style.width = `${size}px`;
+            glow.style.height = `${size}px`;
+            glow.style.opacity = `${brightnessPercent / 100}`;
+        }
+
+        // Gallery Functions
+        function renderGallery() {
+            const grid = document.getElementById('gallery-grid');
+            if(!grid) return;
+
+            const searchQuery = document.getElementById('gallery-search')?.value.toLowerCase() || '';
+
+            const filtered = galleryItems.filter(item => {
+                const matchFilter = activeFilter === 'all' || item.group === activeFilter;
+                const matchSearch = item.title.toLowerCase().includes(searchQuery) || 
+                                    item.author.toLowerCase().includes(searchQuery) ||
+                                    item.desc.toLowerCase().includes(searchQuery);
+                return matchFilter && matchSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-slate-400 font-medium text-sm">
+                        검색 조건에 해당되는 학생 제출물이 없습니다.
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(item => `
+                <div class="glass-card rounded-3xl overflow-hidden border border-white/80 shadow-xs hover:shadow-lg transition duration-300 flex flex-col justify-between group">
+                    <div class="relative h-44 bg-gradient-to-tr ${item.bgGradient} p-5 text-white flex flex-col justify-between overflow-hidden">
+                        <div class="flex justify-between items-start z-10">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-white/20 backdrop-blur-md border border-white/30">${item.group}</span>
+                            <button onclick="likeItem(${item.id})" class="px-2.5 py-1 rounded-full text-xs font-bold bg-black/30 hover:bg-pink-600/80 transition flex items-center space-x-1">
+                                <i class="fa-solid fa-heart text-pink-300"></i>
+                                <span>${item.likes}</span>
+                            </button>
+                        </div>
+
+                        <div class="z-10">
+                            <h4 class="font-bold text-base line-clamp-1 group-hover:text-amber-200 transition">${item.title}</h4>
+                            <p class="text-xs text-slate-200">${item.author}</p>
+                        </div>
+
+                        <i class="fa-solid ${item.starIcon || 'fa-star'} absolute -bottom-4 -right-4 text-8xl text-white/10"></i>
+                    </div>
+
+                    <div class="p-5 space-y-4 flex-1 flex flex-col justify-between">
+                        <p class="text-xs text-slate-600 line-clamp-3 leading-relaxed">${item.desc}</p>
+                        <button onclick="openModal(${item.id})" class="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-700 font-bold text-xs transition flex items-center justify-center space-x-1">
+                            <i class="fa-solid fa-expand"></i>
+                            <span>포스터 & 영상 상세보기</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function setFilter(groupName) {
+            activeFilter = groupName;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active-filter'));
+            event.target.classList.add('active-filter');
+            renderGallery();
+        }
+
+        function filterGallery() {
+            renderGallery();
+        }
+
+        function likeItem(itemId) {
+            const item = galleryItems.find(i => i.id === itemId);
+            if(item) {
+                item.likes++;
+                renderGallery();
+                if(currentModalItemId === itemId) {
+                    document.getElementById('modal-likes-count').textContent = `좋아요 ${item.likes}`;
+                }
+            }
+        }
+
+        function openModal(itemId) {
+            const item = galleryItems.find(i => i.id === itemId);
+            if(!item) return;
+
+            currentModalItemId = itemId;
+            document.getElementById('modal-group').textContent = item.group;
+            document.getElementById('modal-title').textContent = item.title;
+            document.getElementById('modal-author').textContent = `작성자: ${item.author}`;
+            document.getElementById('modal-desc').textContent = item.desc;
+            document.getElementById('modal-likes-count').textContent = `좋아요 ${item.likes}`;
+
+            const container = document.getElementById('modal-img-container');
+            container.className = `h-56 sm:h-64 rounded-2xl bg-gradient-to-tr ${item.bgGradient} flex flex-col items-center justify-center text-white p-6 relative overflow-hidden shadow-inner`;
+            container.innerHTML = `
+                <i class="fa-solid ${item.starIcon || 'fa-star'} text-6xl text-amber-300 mb-3 animate-pulse"></i>
+                <span class="text-sm font-bold">${item.title}</span>
+                <span class="text-xs text-slate-300 mt-1">[학생 제작 탐구 포스터 카드]</span>
+            `;
+
+            document.getElementById('modal-video-link').href = item.videoUrl || '#';
+            document.getElementById('gallery-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('gallery-modal').classList.add('hidden');
+            currentModalItemId = null;
+        }
+
+        function likeActiveModalItem() {
+            if(currentModalItemId) {
+                likeItem(currentModalItemId);
+            }
+        }
+
+        // Submission Form Handler
+        function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const group = document.getElementById('sub-group').value;
+            const author = document.getElementById('sub-author').value;
+            const title = document.getElementById('sub-title').value;
+            const desc = document.getElementById('sub-desc').value;
+            const videoUrl = document.getElementById('sub-link').value || 'https://www.youtube.com';
+
+            const newItem = {
+                id: Date.now(),
+                group: group,
+                author: author,
+                title: title,
+                desc: desc,
+                likes: 0,
+                videoUrl: videoUrl,
+                bgGradient: 'from-indigo-600 via-purple-600 to-pink-600',
+                starIcon: 'fa-star'
+            };
+
+            galleryItems.unshift(newItem);
+            renderGallery();
+
+            alert('🎉 과제가 성공적으로 제출 및 갤러리에 업로드되었습니다!');
+            document.getElementById('submission-form').reset();
+            navigateTo('gallery');
+        }
+
+        // Q&A Handlers
+        function renderQna() {
+            const list = document.getElementById('qna-list');
+            if(!list) return;
+
+            list.innerHTML = qnaItems.map(q => `
+                <div class="p-4 rounded-2xl bg-white border border-slate-100 shadow-xs space-y-2 text-xs">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-slate-800"><i class="fa-solid fa-circle-question text-indigo-500 mr-1"></i>${q.author} 학생의 질문</span>
+                        <span class="text-[10px] text-slate-400">답변완료</span>
+                    </div>
+                    <p class="text-slate-700 font-medium">${q.question}</p>
+                    <div class="p-3 rounded-xl bg-indigo-50/70 border border-indigo-100 text-indigo-900 mt-1">
+                        <strong class="block text-[11px] text-indigo-700 mb-0.5"><i class="fa-solid fa-chalkboard-user mr-1"></i>선생님 답변:</strong>
+                        ${q.answer}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleQnaSubmit(e) {
+            e.preventDefault();
+            const author = document.getElementById('qna-author').value;
+            const question = document.getElementById('qna-content').value;
+
+            qnaItems.unshift({
+                id: Date.now(),
+                author: author,
+                question: question,
+                answer: '선생님이 확인 후 답변을 작성 중입니다. 잠시만 기다려 주세요! 😊'
+            });
+
+            renderQna();
+            document.getElementById('qna-form').reset();
+        }
+
+        window.onload = function() {
+            renderStarButtons();
+            selectStar('sirius');
+            calculateDistanceRule();
+            updateBrightnessSim();
+            renderGallery();
+            renderQna();
+        }
+    </script>
+</body>
+</html>
