@@ -736,21 +736,16 @@ service cloud.firestore {
         // APP GLOBAL STATE
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'stars-universe-edu';
         
-        // Default Mock Firebase Config (Or custom injected config)
-        let firebaseConfig = {
-            apiKey: "AIzaSyMockKeyForPreviewModeOnly12345",
-            authDomain: "stars-universe-demo.firebaseapp.com",
-            projectId: "stars-universe-demo",
-            storageBucket: "stars-universe-demo.appspot.com",
-            messagingSenderId: "1234567890",
-            appId: "1:1234567890:web:abcdef123456"
+        // Corrected Real Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHTKGcrsbcRSxkRP2qGA1Yr_pqJar2XXU",
+            authDomain: "starhongik.firebaseapp.com",
+            projectId: "starhongik",
+            storageBucket: "starhongik.firebasestorage.app",
+            messagingSenderId: "228670184165",
+            appId: "1:228670184165:web:2543848d12e9f487b7920c",
+            measurementId: "G-3R4W23EDRV"
         };
-
-        // Try load custom config from localStorage if present
-        const savedConfig = localStorage.getItem('custom_firebase_config');
-        if (savedConfig) {
-            try { firebaseConfig = JSON.parse(savedConfig); } catch(e) {}
-        }
 
         let app, auth, db;
         let isFirebaseInitialized = false;
@@ -761,7 +756,7 @@ service cloud.firestore {
             db = getFirestore(app);
             isFirebaseInitialized = true;
         } catch (e) {
-            console.warn("Firebase initialization skipped or in mock preview mode:", e);
+            console.warn("Firebase initialization error:", e);
         }
 
         // Global User State
@@ -807,7 +802,7 @@ service cloud.firestore {
                     }
                 });
             } else {
-                // Mock initial logged-in student for instant playground
+                // Mock initial logged-in student for fallback playground
                 window.currentUser = { uid: "mock-student-123", displayName: "김과학 (학생)", email: "student@school.edu" };
                 updateAuthUI(window.currentUser);
             }
@@ -840,7 +835,6 @@ service cloud.firestore {
         // AUTH HANDLERS
         window.handleGoogleSignIn = async function() {
             if (!isFirebaseInitialized || !auth) {
-                // Mock Login Toggle for Preview Environment
                 window.currentUser = {
                     uid: "mock-teacher-456",
                     displayName: "이선생 (교사)",
@@ -891,8 +885,7 @@ service cloud.firestore {
         // ROLE & APPROVAL STATUS CHECKER
         async function checkUserRoleAndStatus(uid) {
             if (!isFirebaseInitialized || !db) {
-                // In Mock Mode: Treat as teacher if email contains 'teacher'
-                if (window.currentUser && window.currentUser.email.includes('teacher')) {
+                if (window.currentUser && window.currentUser.email && window.currentUser.email.includes('teacher')) {
                     window.userRole = 'teacher';
                 } else {
                     window.userRole = 'student';
@@ -1038,7 +1031,7 @@ service cloud.firestore {
                 const cx = canvas.width / 2;
                 const cy = canvas.height / 2 + 60;
 
-                // 1. Draw Sun at center
+                // 1. Draw Sun
                 ctx.beginPath();
                 ctx.arc(cx, cy, 14, 0, Math.PI * 2);
                 ctx.fillStyle = '#F59E0B';
@@ -1124,7 +1117,6 @@ service cloud.firestore {
                 const m = parseFloat(apparentSlider.value);
                 const d = parseFloat(magDistSlider.value);
 
-                // m - M = 5 log10(d) - 5 => M = m - 5 log10(d) + 5
                 const M = m - (5 * Math.log10(d)) + 5;
 
                 document.getElementById('apparentValText').innerText = `${m.toFixed(1)} 등급`;
@@ -1292,7 +1284,6 @@ service cloud.firestore {
 
         async function loadTeacherDashboardData() {
             if (isFirebaseInitialized && db) {
-                // Fetch Pending Student Registrations
                 const regQuery = query(collection(db, 'artifacts', appId, 'public', 'data', 'student_registrations'));
                 onSnapshot(regQuery, (snapshot) => {
                     const regs = [];
@@ -1300,7 +1291,6 @@ service cloud.firestore {
                     renderTeacherRegistrationsTable(regs);
                 }, (err) => console.error(err));
 
-                // Fetch Submitted Posters
                 const posterQuery = query(collection(db, 'artifacts', appId, 'public', 'data', 'posters'));
                 onSnapshot(posterQuery, (snapshot) => {
                     const posters = [];
@@ -1309,7 +1299,6 @@ service cloud.firestore {
                     renderTeacherPostersGrid(posters);
                 }, (err) => console.error(err));
             } else {
-                // Render Local Simulation Data
                 renderTeacherRegistrationsTable(window.localRegistrationsData);
                 renderTeacherPostersGrid(window.localPostersData);
             }
@@ -1518,7 +1507,6 @@ service cloud.firestore {
             }
         };
 
-        // Expose functions globally
         window.filterTeacherPosters = function() {
             const queryText = document.getElementById('teacherSearchStudent').value.toLowerCase();
             const filtered = window.localPostersData.filter(p => p.studentName.toLowerCase().includes(queryText) || p.starName.toLowerCase().includes(queryText));
