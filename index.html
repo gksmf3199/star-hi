@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>별과 우주 - 연주시차 & 절대등급 포스터 교실</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter & Noto Sans KR -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- HTML2Canvas for Poster Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        space: {
+                            900: '#0B0D17',
+                            800: '#101426',
+                            700: '#1B213B',
+                            600: '#2A3356',
+                            accent: '#6366F1',
+                            gold: '#F59E0B',
+                            cyan: '#06B6D4'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Noto Sans KR', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0B0D17;
+            color: #F3F4F6;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(27, 33, 59, 0.65);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glow-box {
+            box-shadow: 0 0 25px rgba(99, 102, 241, 0.25);
+        }
+        .glow-star {
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B0D17;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2A3356;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6366F1;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+    <!-- Navigation Top Bar -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-gray-800 px-4 lg:px-8 py-3 flex items-center justify-between">
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateTo('landing')">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-amber-400 flex items-center justify-center text-white text-xl font-bold shadow-lg">
+                <i class="fa-solid font-sharp fa-star"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 via-cyan-200 to-amber-200">
+                    별과 우주 <span class="text-xs font-normal text-indigo-400 px-2 py-0.5 rounded-full bg-indigo-950 border border-indigo-800">중학교 과학</span>
+                </h1>
+                <p class="text-xs text-gray-400">연주시차 • 절대등급 • 나만의 별 포스터</p>
+            </div>
+        </div>
+
+        <!-- User Profile & Status -->
+        <div id="authStatusContainer" class="flex items-center space-x-3">
+            <button onclick="openConfigModal()" class="text-xs px-3 py-1.5 rounded-lg bg-gray-800 border border-gray-700 hover:border-indigo-500 text-gray-300 transition flex items-center space-x-1">
+                <i class="fa-solid fa-gear text-indigo-400"></i>
+                <span class="hidden sm:inline">Firebase 설정/가이드</span>
+            </button>
+            <div id="userProfile" class="hidden flex items-center space-x-3 bg-gray-900/80 px-3 py-1.5 rounded-xl border border-gray-800">
+                <img id="userAvatar" src="https://placehold.co/100x100/1e293b/ffffff?text=User" class="w-8 h-8 rounded-full border border-indigo-500/50" alt="Avatar">
+                <div class="text-left hidden md:block">
+                    <div id="userName" class="text-xs font-bold text-gray-200 leading-tight">사용자</div>
+                    <div id="userRoleBadge" class="text-[10px] text-indigo-400 font-medium">로그인 완료</div>
+                </div>
+                <button onclick="handleSignOut()" class="text-xs px-2.5 py-1 bg-red-950/60 border border-red-800/80 text-red-300 rounded-lg hover:bg-red-900 transition">
+                    로그아웃
+                </button>
+            </div>
+            <button id="loginPromptBtn" onclick="handleGoogleSignIn()" class="text-xs font-semibold px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-md transition flex items-center space-x-2">
+                <i class="fa-brands fa-google"></i>
+                <span>Google 로그인</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Global App Notice Banner -->
+    <div id="demoNotice" class="bg-amber-950/40 border-b border-amber-800/50 px-4 py-2 text-xs text-amber-200 flex justify-between items-center">
+        <span><i class="fa-solid fa-triangle-exclamation text-amber-400 mr-2"></i><strong>안내:</strong> Firebase 설정이 연결되지 않은 경우, 로컬 시뮬레이션 모드로 작동합니다. 오른쪽 상단 'Firebase 설정/가이드' 버튼에서 설정법과 보안 규칙을 확인하세요.</span>
+        <button onclick="this.parentElement.style.display='none'" class="text-amber-400 hover:text-amber-200"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- MAIN VIEW CONTAINER -->
+    <main class="flex-grow container mx-auto px-4 py-6 max-w-7xl">
+
+        <!-- VIEW 1: LANDING & ROLE SELECTION -->
+        <section id="viewLanding" class="space-y-8 py-8">
+            <div class="text-center max-w-3xl mx-auto space-y-4">
+                <span class="inline-block px-3 py-1 bg-indigo-900/60 border border-indigo-700 text-indigo-300 rounded-full text-xs font-semibold tracking-wide">
+                    2022 개정 교육과정 • 중학교 과학 3학년
+                </span>
+                <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+                    밤하늘을 탐구하고 <br>
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-amber-300 via-indigo-300 to-cyan-300">
+                        나만의 별 포스터
+                    </span>를 제작하세요!
+                </h2>
+                <p class="text-gray-400 text-sm sm:text-base leading-relaxed">
+                    별의 연주시차를 측정하여 거리를 계산하고, 겉보기등급과 절대등급의 차이를 알아봅니다.
+                    공부한 내용을 바탕으로 신비로운 나만의 별 포스터를 만들어 교사에게 제출해보세요.
+                </p>
+            </div>
+
+            <!-- Role Selection Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto pt-4">
+                <!-- Student Entrance Card -->
+                <div class="glass-panel rounded-2xl p-8 hover:border-indigo-500/80 transition-all duration-300 transform hover:-translate-y-1 group flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-600/10 rounded-full blur-2xl group-hover:bg-indigo-600/20 transition"></div>
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-indigo-900/80 border border-indigo-700 flex items-center justify-center text-indigo-300 text-2xl mb-6">
+                            <i class="fa-solid fa-user-graduate"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-2">학생 공간</h3>
+                        <p class="text-gray-400 text-sm mb-6 leading-relaxed">
+                            연주시차 시뮬레이터 실습, 유명한 별 데이터 탐색, 연주시차와 등급 계산, 나만의 별 포스터 제작 및 제출
+                        </p>
+                    </div>
+                    <button onclick="enterAsRole('student')" class="w-full py-3.5 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-semibold text-white transition flex items-center justify-center space-x-2 shadow-lg shadow-indigo-900/50">
+                        <span>학생으로 입장하기</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+
+                <!-- Teacher Entrance Card -->
+                <div class="glass-panel rounded-2xl p-8 hover:border-cyan-500/80 transition-all duration-300 transform hover:-translate-y-1 group flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-cyan-600/10 rounded-full blur-2xl group-hover:bg-cyan-600/20 transition"></div>
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-cyan-900/80 border border-cyan-700 flex items-center justify-center text-cyan-300 text-2xl mb-6">
+                            <i class="fa-solid fa-chalkboard-user"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-2">교사 대시보드</h3>
+                        <p class="text-gray-400 text-sm mb-6 leading-relaxed">
+                            수업 참여 학생 승인/관리, 학생별 작성 포스터 및 연주시차 계산 검토, 1:1 맞춤형 피드백 작성
+                        </p>
+                    </div>
+                    <button onclick="enterAsRole('teacher')" class="w-full py-3.5 px-6 rounded-xl bg-slate-800 hover:bg-slate-700 border border-cyan-500/50 font-semibold text-cyan-300 transition flex items-center justify-center space-x-2">
+                        <span>교사로 입장하기</span>
+                        <i class="fa-solid fa-lock text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Key Scientific Concepts Summary -->
+            <div class="max-w-4xl mx-auto glass-panel p-6 rounded-2xl border border-gray-800 text-xs text-gray-300 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="flex items-start space-x-3">
+                    <i class="fa-solid fa-compass-drafting text-amber-400 text-lg mt-1"></i>
+                    <div>
+                        <h4 class="font-bold text-white text-sm mb-1">연주시차 ($p''$)</h4>
+                        <p>지구가 태양 주위를 공전할 때, 6개월 간격으로 별을 관측했을 때 생기는 각도의 $\frac{1}{2}$. 거리($d$)와 역수 관계 ($d = \frac{1}{p}$ pc).</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <i class="fa-solid fa-eye text-cyan-400 text-lg mt-1"></i>
+                    <div>
+                        <h4 class="font-bold text-white text-sm mb-1">겉보기등급 ($m$)</h4>
+                        <p>우리 눈에 실제로 보이는 별의 밝기 등급. 숫자가 작을수록 더 밝게 보입니다.</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <i class="fa-solid fa-ruler-combined text-indigo-400 text-lg mt-1"></i>
+                    <div>
+                        <h4 class="font-bold text-white text-sm mb-1">절대등급 ($M$)</h4>
+                        <p>모든 별을 $10\text{ pc}$ ($32.6\text{ 광년}$) 거리에 두었다고 가정했을 때의 실제 밝기 등급.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 2: STUDENT PORTAL -->
+        <section id="viewStudent" class="hidden space-y-6">
+
+            <!-- Student Status Header -->
+            <div class="flex flex-wrap items-center justify-between gap-4 glass-panel p-4 rounded-2xl border border-indigo-900/50">
+                <div class="flex items-center space-x-3">
+                    <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <div>
+                        <h3 class="font-bold text-white text-lg">학생 수업 활동 모듈</h3>
+                        <p class="text-xs text-gray-400">담당 교사 승인 상태: <span id="studentApprovalText" class="text-amber-400 font-semibold">확인 중...</span></p>
+                    </div>
+                </div>
+                <!-- Student Tabs -->
+                <div class="flex space-x-2 bg-gray-900/90 p-1 rounded-xl border border-gray-800 text-xs font-semibold">
+                    <button onclick="switchStudentTab('explore')" id="tabBtnExplore" class="px-4 py-2 rounded-lg bg-indigo-600 text-white">1. 별 관측 시뮬레이션</button>
+                    <button onclick="switchStudentTab('famous')" id="tabBtnFamous" class="px-4 py-2 rounded-lg text-gray-400 hover:text-white">2. 유명한 별 도감</button>
+                    <button onclick="switchStudentTab('poster')" id="tabBtnPoster" class="px-4 py-2 rounded-lg text-gray-400 hover:text-white">3. 나만의 별 포스터 제작</button>
+                    <button onclick="switchStudentTab('myFeedback')" id="tabBtnMyFeedback" class="px-4 py-2 rounded-lg text-gray-400 hover:text-white relative">
+                        4. 내 피드백
+                        <span id="feedbackBadge" class="hidden absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Student Registration Pending Alert -->
+            <div id="registrationPendingAlert" class="hidden glass-panel p-6 rounded-2xl border border-amber-500/50 bg-amber-950/20 text-center space-y-3">
+                <i class="fa-solid fa-hourglass-half text-amber-400 text-3xl animate-spin"></i>
+                <h4 class="text-lg font-bold text-amber-300">교사의 승인을 기다리는 중입니다</h4>
+                <p class="text-xs text-gray-300 max-w-md mx-auto">
+                    선생님이 학생의 수강 신청을 승인하면 작성한 포스터가 교사 대시보드로 전달되고 제출 완료 처리됩니다. 
+                    아래 시뮬레이션 및 포스터 제작은 승인 전에도 자유롭게 연습할 수 있습니다!
+                </p>
+                <div class="flex justify-center space-x-2 pt-2">
+                    <input type="text" id="studentClassInput" placeholder="예: 3학년 2반 15번 홍길동" class="px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-xs w-64 text-white focus:outline-none focus:border-indigo-500">
+                    <button onclick="submitStudentRegistration()" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-bold transition">
+                        학급 정보 제출
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB 1: PARALLAX & MAGNITUDE SIMULATOR -->
+            <div id="subTabExplore" class="space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Parallax Canvas Simulation -->
+                    <div class="glass-panel p-5 rounded-2xl border border-gray-800 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-indigo-300 text-sm flex items-center space-x-2">
+                                <i class="fa-solid fa-satellite"></i>
+                                <span>연주시차 실시간 2D 시뮬레이터</span>
+                            </h4>
+                            <span class="text-[11px] text-gray-400">지구 공전 & 시차각 관측</span>
+                        </div>
+                        <!-- Canvas -->
+                        <div class="relative w-full aspect-video bg-black rounded-xl overflow-hidden border border-gray-800 flex items-center justify-center">
+                            <canvas id="parallaxCanvas" class="w-full h-full block"></canvas>
+                        </div>
+                        <!-- Slider Controls -->
+                        <div class="space-y-3 bg-gray-900/60 p-4 rounded-xl border border-gray-800/80">
+                            <div class="flex justify-between items-center text-xs">
+                                <label class="text-gray-300 font-medium">별까지의 거리 ($d$)</label>
+                                <span class="font-bold text-amber-400" id="distanceValText">2.00 pc (6.52 광년)</span>
+                            </div>
+                            <input type="range" id="distanceSlider" min="0.5" max="10" step="0.1" value="2.0" class="w-full accent-indigo-500 cursor-pointer">
+                            
+                            <div class="grid grid-cols-3 gap-2 text-center pt-2 border-t border-gray-800">
+                                <div class="bg-gray-950 p-2 rounded-lg">
+                                    <div class="text-[10px] text-gray-400">연주시차 ($p''$)</div>
+                                    <div class="text-xs font-extrabold text-cyan-300" id="calculatedParallaxText">0.500"</div>
+                                </div>
+                                <div class="bg-gray-950 p-2 rounded-lg">
+                                    <div class="text-[10px] text-gray-400">거리 (파섹)</div>
+                                    <div class="text-xs font-extrabold text-indigo-300" id="calculatedPcText">2.00 pc</div>
+                                </div>
+                                <div class="bg-gray-950 p-2 rounded-lg">
+                                    <div class="text-[10px] text-gray-400">태양-지구 거리의</div>
+                                    <div class="text-xs font-extrabold text-amber-300" id="calculatedAuText">412,530 배</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Apparent vs Absolute Magnitude Calculator -->
+                    <div class="glass-panel p-5 rounded-2xl border border-gray-800 space-y-4 flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-bold text-cyan-300 text-sm mb-3 flex items-center space-x-2">
+                                <i class="fa-solid fa-sliders"></i>
+                                <span>겉보기등급($m$) & 절대등급($M$) 비교기</span>
+                            </h4>
+                            <p class="text-xs text-gray-400 mb-4 leading-relaxed">
+                                거리 등급 관계식: $m - M = 5 \log_{10}(d) - 5$ <br>
+                                별이 $10\text{ pc}$보다 가까우면 겉보기등급이 절대등급보다 밝고(숫자가 작음), 멀어지면 어두워집니다.
+                            </p>
+
+                            <div class="space-y-4 bg-gray-900/60 p-4 rounded-xl border border-gray-800">
+                                <!-- Apparent Slider -->
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-gray-300">겉보기등급 ($m$)</span>
+                                        <span id="apparentValText" class="font-bold text-cyan-400">1.0 등급</span>
+                                    </div>
+                                    <input type="range" id="apparentSlider" min="-5" max="15" step="0.5" value="1.0" class="w-full accent-cyan-500 cursor-pointer">
+                                </div>
+
+                                <!-- Distance Slider for Mag -->
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-gray-300">거리 ($d$)</span>
+                                        <span id="magDistValText" class="font-bold text-amber-400">10.0 pc</span>
+                                    </div>
+                                    <input type="range" id="magDistSlider" min="1" max="100" step="1" value="10" class="w-full accent-amber-500 cursor-pointer">
+                                </div>
+
+                                <!-- Calculated Absolute Magnitude -->
+                                <div class="p-3 bg-indigo-950/50 rounded-xl border border-indigo-800/80 flex items-center justify-between">
+                                    <span class="text-xs text-indigo-200">계산된 절대등급 ($M$)</span>
+                                    <span id="calculatedAbsMag" class="text-lg font-black text-amber-300">1.0 등급</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Visual Brightness Scale Bar -->
+                        <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
+                            <div class="text-[11px] text-gray-400 font-semibold">밝기 위치 비교 (10pc 기준)</div>
+                            <div class="relative h-6 bg-gradient-to-r from-amber-200 via-indigo-900 to-gray-950 rounded-full border border-gray-800 overflow-hidden flex items-center px-3 justify-between text-[10px] text-gray-300 font-bold">
+                                <span>가까움 ($d < 10\text{pc}$)</span>
+                                <span>기준 ($10\text{pc}$)</span>
+                                <span>멀음 ($d > 10\text{pc}$)</span>
+                            </div>
+                            <div id="distanceStatusNotice" class="text-[11px] text-center text-cyan-300 font-semibold pt-1">
+                                현재 거리: $10\text{ pc}$ (겉보기등급 = 절대등급)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: FAMOUS STARS DATABASE -->
+            <div id="subTabFamous" class="hidden space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h4 class="font-bold text-white text-base">유명한 별 우주 도감</h4>
+                        <p class="text-xs text-gray-400">실제 관측 데이터로 별의 연주시차, 절대등급, 거리를 확인해보세요.</p>
+                    </div>
+                </div>
+
+                <div id="famousStarsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Dynamic Star Cards Injected via JS -->
+                </div>
+            </div>
+
+            <!-- TAB 3: MY STAR POSTER BUILDER -->
+            <div id="subTabPoster" class="hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    
+                    <!-- Left Column: Form & Inputs -->
+                    <div class="lg:col-span-5 glass-panel p-5 rounded-2xl border border-gray-800 space-y-4">
+                        <h4 class="font-bold text-amber-300 text-sm flex items-center space-x-2">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <span>포스터 내용 및 연주시차 데이터 입력</span>
+                        </h4>
+
+                        <form id="posterForm" onsubmit="event.preventDefault(); updatePosterPreview();" class="space-y-3 text-xs">
+                            <div>
+                                <label class="block text-gray-300 font-medium mb-1">별 이름</label>
+                                <input type="text" id="pStarName" value="시리우스 (Sirius)" placeholder="별 이름 입력" class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-indigo-500">
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-gray-300 font-medium mb-1">연주시차 ($p''$)</label>
+                                    <input type="number" step="0.001" id="pParallax" value="0.379" oninput="autoCalculatePosterValues()" class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-300 font-medium mb-1">겉보기등급 ($m$)</label>
+                                    <input type="number" step="0.1" id="pApparentMag" value="-1.46" oninput="autoCalculatePosterValues()" class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-indigo-500">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 bg-gray-900/80 p-3 rounded-xl border border-gray-800">
+                                <div>
+                                    <span class="text-gray-400">자동계산 거리 ($d$)</span>
+                                    <div id="autoPosterDist" class="font-bold text-indigo-300 text-sm mt-0.5">2.64 pc (8.60 광년)</div>
+                                </div>
+                                <div>
+                                    <span class="text-gray-400">자동계산 절대등급 ($M$)</span>
+                                    <div id="autoPosterAbsMag" class="font-bold text-amber-300 text-sm mt-0.5">+1.43 등급</div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-300 font-medium mb-1">지구-태양 거리의 몇 배인가요?</label>
+                                <input type="text" id="pAuRatio" readonly value="544,539 배" class="w-full px-3 py-2 bg-gray-950 border border-gray-800 rounded-lg text-amber-400 font-bold">
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-300 font-medium mb-1">별의 주요 특징 및 탐구 내용</label>
+                                <textarea id="pDescription" rows="3" placeholder="별의 색깔, 별자리, 태양과의 비교, 우주에서의 특징을 자유롭게 적어보세요." class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-indigo-500">밤하늘에서 가장 밝게 보이는 별로, 큰개자리에 위치해 있습니다. 표면 온도가 높은 A형 주계열성입니다.</textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-300 font-medium mb-1">포스터 배경 테마</label>
+                                <select id="pTheme" onchange="updatePosterPreview()" class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-indigo-500">
+                                    <option value="theme-deep">딥 스페이스 푸른 은하수 (Deep Blue)</option>
+                                    <option value="theme-gold">황금빛 초신성 (Supernova Gold)</option>
+                                    <option value="theme-nebula">보랏빛 성운 (Purple Nebula)</option>
+                                    <option value="theme-cyan">에메랄드 우주 (Cyan Aurora)</option>
+                                </select>
+                            </div>
+
+                            <div class="pt-2 flex space-x-2">
+                                <button type="button" onclick="updatePosterPreview()" class="flex-1 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold rounded-lg transition border border-gray-700">
+                                    미리보기 갱신
+                                </button>
+                                <button type="button" onclick="submitPosterToTeacher()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg transition shadow-lg shadow-indigo-900/50 flex items-center justify-center space-x-1">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                    <span>교사에게 제출</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Right Column: Visual Poster Canvas Preview -->
+                    <div class="lg:col-span-7 flex flex-col items-center justify-center">
+                        <div class="text-xs text-gray-400 mb-2 flex items-center space-x-2">
+                            <i class="fa-solid fa-eye"></i>
+                            <span>실시간 제출용 포스터 미리보기 (Canvas Render)</span>
+                        </div>
+
+                        <!-- Poster Card Element -->
+                        <div id="posterCanvasTarget" class="w-full max-w-md aspect-[3/4] rounded-2xl p-6 flex flex-col justify-between shadow-2xl relative border-2 border-indigo-500/30 overflow-hidden transition-all duration-300 bg-gradient-to-b from-slate-900 via-indigo-950 to-black">
+                            
+                            <!-- Background Glowing Star Element -->
+                            <div class="absolute -right-8 -top-8 w-48 h-48 rounded-full bg-amber-400/20 blur-3xl"></div>
+                            <div class="absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full bg-indigo-500/20 blur-2xl"></div>
+
+                            <!-- Poster Header -->
+                            <div class="relative z-10 border-b border-white/10 pb-4">
+                                <div class="flex justify-between items-start">
+                                    <span class="px-2.5 py-0.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[10px] font-bold text-amber-300 tracking-wider uppercase">
+                                        우주 탐구 포스터
+                                    </span>
+                                    <span id="posterStudentBadge" class="text-[11px] font-medium text-gray-300">
+                                        작성자: 학생
+                                    </span>
+                                </div>
+                                <h3 id="prevStarName" class="text-2xl font-black text-white mt-2 tracking-tight">
+                                    시리우스 (Sirius)
+                                </h3>
+                                <p class="text-xs text-indigo-200 mt-0.5">별 탐구 보고서 & 광학적 거리 계산</p>
+                            </div>
+
+                            <!-- Poster Core Numerical Data Grid -->
+                            <div class="relative z-10 my-4 grid grid-cols-2 gap-2 text-xs">
+                                <div class="bg-black/40 backdrop-blur-md p-3 rounded-xl border border-white/10 space-y-0.5">
+                                    <div class="text-[10px] text-gray-400">연주시차 ($p''$)</div>
+                                    <div id="prevParallax" class="font-bold text-cyan-300 text-sm">0.379"</div>
+                                </div>
+                                <div class="bg-black/40 backdrop-blur-md p-3 rounded-xl border border-white/10 space-y-0.5">
+                                    <div class="text-[10px] text-gray-400">지구와의 거리 ($d$)</div>
+                                    <div id="prevDistance" class="font-bold text-indigo-300 text-sm">2.64 pc</div>
+                                </div>
+                                <div class="bg-black/40 backdrop-blur-md p-3 rounded-xl border border-white/10 space-y-0.5">
+                                    <div class="text-[10px] text-gray-400">겉보기등급 ($m$)</div>
+                                    <div id="prevApparent" class="font-bold text-amber-300 text-sm">-1.46 등급</div>
+                                </div>
+                                <div class="bg-black/40 backdrop-blur-md p-3 rounded-xl border border-white/10 space-y-0.5">
+                                    <div class="text-[10px] text-gray-400">절대등급 ($M$)</div>
+                                    <div id="prevAbsolute" class="font-bold text-amber-400 text-sm">+1.43 등급</div>
+                                </div>
+                            </div>
+
+                            <!-- Distance Comparison Highlight Box -->
+                            <div class="relative z-10 bg-amber-950/40 backdrop-blur-md p-3 rounded-xl border border-amber-500/30 text-center">
+                                <div class="text-[10px] text-amber-200 uppercase tracking-wider font-semibold">태양-지구 거리에 비한 거리비</div>
+                                <div id="prevAuRatio" class="text-base font-extrabold text-amber-300">544,539 배</div>
+                            </div>
+
+                            <!-- Poster Description Box -->
+                            <div class="relative z-10 my-2 bg-black/40 backdrop-blur-md p-3 rounded-xl border border-white/10 text-xs text-gray-300 flex-grow overflow-hidden">
+                                <div class="text-[10px] text-indigo-300 font-bold mb-1">별의 주요 특징</div>
+                                <p id="prevDescription" class="line-clamp-4 leading-relaxed text-[11px]">
+                                    밤하늘에서 가장 밝게 보이는 별로, 큰개자리에 위치해 있습니다. 표면 온도가 높은 A형 주계열성입니다.
+                                </p>
+                            </div>
+
+                            <!-- Poster Footer -->
+                            <div class="relative z-10 pt-2 border-t border-white/10 flex justify-between items-center text-[10px] text-gray-400">
+                                <span>중학교 과학 • 별과 우주</span>
+                                <span id="prevTimestamp">2026. 07. 25</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: MY FEEDBACK VIEW -->
+            <div id="subTabMyFeedback" class="hidden space-y-4">
+                <h4 class="font-bold text-white text-base">선생님의 1:1 맞춤 피드백 및 평가</h4>
+                <div id="myFeedbackContainer" class="glass-panel p-6 rounded-2xl border border-gray-800 space-y-4">
+                    <!-- Dynamic My Feedback content loaded here -->
+                    <p class="text-xs text-gray-400 text-center py-8">아직 제출한 포스터가 없거나 선생님의 피드백이 작성되지 않았습니다.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 3: TEACHER DASHBOARD -->
+        <section id="viewTeacher" class="hidden space-y-6">
+            
+            <!-- Teacher Authorization Header -->
+            <div class="flex flex-wrap items-center justify-between gap-4 glass-panel p-4 rounded-2xl border border-cyan-900/50">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-cyan-900/80 border border-cyan-700 flex items-center justify-center text-cyan-300 font-bold text-lg">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white text-lg">교사 전용 대시보드 및 평가 시스템</h3>
+                        <p class="text-xs text-gray-400">교사 승인 계정: <span id="teacherEmailText" class="text-cyan-300 font-semibold">검증 중...</span></p>
+                    </div>
+                </div>
+
+                <!-- Teacher Controls -->
+                <div class="flex space-x-2">
+                    <button onclick="loadTeacherDashboardData()" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 border border-gray-700 text-xs text-gray-200 transition flex items-center space-x-1">
+                        <i class="fa-solid fa-rotate text-cyan-400"></i>
+                        <span>데이터 새로고침</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Access Denied Card (If user is not verified teacher) -->
+            <div id="teacherAccessDenied" class="hidden glass-panel p-8 rounded-2xl border border-red-500/50 bg-red-950/20 text-center space-y-4">
+                <i class="fa-solid fa-shield-halved text-red-400 text-4xl"></i>
+                <h4 class="text-xl font-bold text-red-300">교사 권한이 필요합니다</h4>
+                <p class="text-xs text-gray-300 max-w-lg mx-auto leading-relaxed">
+                    현재 로그인한 Google 계정은 Firestore 권한 목록(<code class="bg-black/50 px-2 py-0.5 rounded text-amber-300">roles</code> 컬렉션)에 
+                    <strong>teacher</strong> 역할로 등록되지 않았습니다. <br>
+                    우측 상단 'Firebase 설정/가이드'를 참고하여 Firestore DB에 본인의 UID를 교사로 등록하세요.
+                </p>
+            </div>
+
+            <!-- Teacher Main Grid (Shown only when verified teacher) -->
+            <div id="teacherMainContent" class="space-y-6">
+                
+                <!-- Section 1: Pending Student Approval Requests -->
+                <div class="glass-panel p-5 rounded-2xl border border-gray-800 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h4 class="font-bold text-amber-300 text-sm flex items-center space-x-2">
+                            <i class="fa-solid fa-user-clock"></i>
+                            <span>학생 참여 승인 대기 목록</span>
+                        </h4>
+                        <span id="pendingCountBadge" class="text-xs px-2.5 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-800">0명 대기</span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="border-b border-gray-800 text-gray-400">
+                                    <th class="p-2">학생 이름/이메일</th>
+                                    <th class="p-2">학급/번호 정보</th>
+                                    <th class="p-2">신청 일자</th>
+                                    <th class="p-2 text-right">승인 상태 관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentApprovalTableBody" class="divide-y divide-gray-800/50 text-gray-300">
+                                <tr>
+                                    <td colspan="4" class="p-4 text-center text-gray-500">대기 중인 참여 신청이 없습니다.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Section 2: Submitted Student Posters & Feedback Panel -->
+                <div class="glass-panel p-5 rounded-2xl border border-gray-800 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h4 class="font-bold text-cyan-300 text-sm flex items-center space-x-2">
+                            <i class="fa-solid fa-file-pen"></i>
+                            <span>학생 포스터 제출물 및 피드백 평가</span>
+                        </h4>
+                        <div class="text-xs text-gray-400">제출된 포스터 클릭 시 상세 평가 가능</div>
+                    </div>
+
+                    <!-- Filter Bar -->
+                    <div class="flex items-center space-x-3 bg-gray-900/60 p-3 rounded-xl border border-gray-800 text-xs">
+                        <span class="text-gray-400">필터:</span>
+                        <input type="text" id="teacherSearchStudent" oninput="filterTeacherPosters()" placeholder="학생 이름 검색..." class="px-3 py-1.5 bg-gray-950 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+
+                    <!-- Submitted Poster Cards Grid -->
+                    <div id="teacherPostersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Dynamic Student Submissions injected here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL 1: TEACHER FEEDBACK MODAL -->
+    <div id="feedbackModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-lg rounded-2xl border border-cyan-500/50 p-6 space-y-4 relative text-xs">
+            <button onclick="closeFeedbackModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-base">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <h3 class="text-base font-bold text-white flex items-center space-x-2">
+                <i class="fa-solid fa-star text-amber-400"></i>
+                <span>학생 제출물 평가 및 피드백 작성</span>
+            </h3>
+
+            <div id="modalPosterSummary" class="bg-gray-900/80 p-3 rounded-xl border border-gray-800 space-y-1">
+                <div class="text-gray-400">학생: <span id="modalStudentInfo" class="text-white font-bold">홍길동 (3학년 2반)</span></div>
+                <div class="text-gray-400">탐구 별: <span id="modalStarName" class="text-cyan-300 font-bold">시리우스</span></div>
+            </div>
+
+            <form id="feedbackForm" onsubmit="event.preventDefault(); saveTeacherFeedback();" class="space-y-3">
+                <div>
+                    <label class="block text-gray-300 font-medium mb-1">평가 등급 / 별점</label>
+                    <select id="fGrade" class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-cyan-500">
+                        <option value="A+">A+ (완벽함 - 수치 및 개념 정확)</option>
+                        <option value="A">A (우수함 - 연주시차 계산 정확)</option>
+                        <option value="B">B (보통 - 개념 보완 필요)</option>
+                        <option value="C">C (재제출 요망)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-gray-300 font-medium mb-1">선생님의 맞춤 지도 의견 및 피드백</label>
+                    <textarea id="fComment" rows="4" placeholder="학생의 연주시차 계산 과정, 등급 이해도 및 포스터 창의성에 대한 칭찬과 보완할 점을 적어주세요." class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-cyan-500"></textarea>
+                </div>
+
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeFeedbackModal()" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold rounded-lg transition">취소</button>
+                    <button type="submit" class="px-5 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition shadow-lg shadow-cyan-900/50">피드백 저장 및 전송</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: FIREBASE & SECURITY RULES CONFIG GUIDE MODAL -->
+    <div id="configModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+        <div class="glass-panel w-full max-w-3xl rounded-2xl border border-indigo-500/50 p-6 space-y-6 relative text-xs my-8 max-h-[90vh] overflow-y-auto">
+            <button onclick="closeConfigModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-base">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="border-b border-gray-800 pb-3">
+                <h3 class="text-lg font-bold text-white flex items-center space-x-2">
+                    <i class="fa-solid fa-shield-cat text-indigo-400"></i>
+                    <span>Firebase 연결, 교사 권한 등록 & Firestore 보안 규칙 가이드</span>
+                </h3>
+                <p class="text-gray-400 text-[11px] mt-1">
+                    교사 권한 및 구글 로그인을 완전히 활성화하기 위해 아래 설정 절차를 진행하세요.
+                </p>
+            </div>
+
+            <!-- Firebase Config Input Box -->
+            <div class="space-y-2 bg-gray-950 p-4 rounded-xl border border-gray-800">
+                <h4 class="font-bold text-amber-300">1. 내 Firebase 프로젝트 설정 연동 (옵션)</h4>
+                <p class="text-gray-400">기본적으로 시뮬레이션 모드로 작동하지만, 직접 생성한 Firebase 프로젝트 설정을 적용할 수 있습니다.</p>
+                <textarea id="firebaseConfigJson" rows="4" placeholder='{"apiKey": "...", "authDomain": "...", "projectId": "..."}' class="w-full font-mono text-[11px] px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-green-400 focus:outline-none focus:border-indigo-500"></textarea>
+                <button onclick="saveCustomFirebaseConfig()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg transition">Firebase 설정 저장</button>
+            </div>
+
+            <!-- Security Rules Output Box -->
+            <div class="space-y-2 bg-gray-950 p-4 rounded-xl border border-gray-800">
+                <div class="flex justify-between items-center">
+                    <h4 class="font-bold text-cyan-300">2. 필수 Firestore Security Rules (보안 규칙)</h4>
+                    <button onclick="copySecurityRules()" class="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-cyan-300 rounded border border-gray-700">복사하기</button>
+                </div>
+                <p class="text-gray-400">Firebase 콘솔 → Firestore Database → Rules에 아래 코드를 그대로 붙여넣으세요.</p>
+                <pre id="securityRulesCode" class="p-3 bg-black rounded-lg border border-gray-800 font-mono text-[10px] text-cyan-300 overflow-x-auto selection:bg-cyan-900">
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 교사 권한 확인 헬퍼 함수
+    function isTeacher() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/artifacts/stars-universe-edu/public/data/roles/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/artifacts/stars-universe-edu/public/data/roles/$(request.auth.uid)).data.role == 'teacher';
+    }
+
+    // 역할(Roles) 컬렉션 규칙
+    match /artifacts/stars-universe-edu/public/data/roles/{userId} {
+      allow read: if request.auth != null;
+      allow write: if false; // 보안상 Firebase 콘솔에서만 작성 가능
+    }
+
+    // 학생 등록 신청(Student Registrations) 컬렉션 규칙
+    match /artifacts/stars-universe-edu/public/data/student_registrations/{userId} {
+      allow read: if request.auth != null && (request.auth.uid == userId || isTeacher());
+      allow create, update: if request.auth != null && (request.auth.uid == userId || isTeacher());
+      allow delete: if isTeacher();
+    }
+
+    // 학생 제출 포스터(Posters) 컬렉션 규칙
+    match /artifacts/stars-universe-edu/public/data/posters/{posterId} {
+      allow read: if request.auth != null && (resource.data.studentUid == request.auth.uid || isTeacher());
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && (resource.data.studentUid == request.auth.uid || isTeacher());
+    }
+
+    // 교사 피드백(Feedbacks) 컬렉션 규칙
+    match /artifacts/stars-universe-edu/public/data/feedbacks/{feedbackId} {
+      allow read: if request.auth != null && (resource.data.studentUid == request.auth.uid || isTeacher());
+      allow write: if isTeacher();
+    }
+  }
+}</pre>
+            </div>
+
+            <!-- Firebase Console Step by Step Instructions -->
+            <div class="space-y-3 bg-gray-900/60 p-4 rounded-xl border border-gray-800">
+                <h4 class="font-bold text-white text-sm">3. 클릭 순서별 Firebase 콘솔 직접 설정 방법</h4>
+                <ol class="list-decimal list-inside space-y-2 text-gray-300 leading-relaxed">
+                    <li><strong>Google 로그인 설정:</strong> Firebase 콘솔 접속 → <code class="text-amber-300">Authentication</code> → <code class="text-amber-300">Sign-in method</code> → <code class="text-amber-300">Google</code> 클릭 후 '사용 설정' 토글 ON.</li>
+                    <li><strong>승인된 도메인 등록:</strong> Authentication → Settings → <code class="text-amber-300">Authorized domains</code> → '도메인 추가' 클릭 → GitHub Pages 도메인(예: <code class="text-cyan-300">username.github.io</code>) 입력 (<code class="text-red-400">https://</code> 제외).</li>
+                    <li><strong>교사 계정 수동 등록 (보안 핵심):</strong> 
+                        <br>① 교사가 Google 로그인 후, Authentication의 사용자 목록에서 본인의 <code class="text-amber-300">UID</code> 복사.
+                        <br>② Firestore Database 생성 후 컬렉션 경로: <code class="text-cyan-300">/artifacts/stars-universe-edu/public/data/roles</code> 생성.
+                        <br>③ 문서 ID에 교사 <code class="text-amber-300">UID</code>를 넣고 필드 추가: <code class="text-green-300 font-mono">role: "teacher"</code> (문자열).
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT APP CORE CODE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // APP GLOBAL STATE
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'stars-universe-edu';
+        
+        // Default Mock Firebase Config (Or custom injected config)
+        let firebaseConfig = {
+            apiKey: "AIzaSyMockKeyForPreviewModeOnly12345",
+            authDomain: "stars-universe-demo.firebaseapp.com",
+            projectId: "stars-universe-demo",
+            storageBucket: "stars-universe-demo.appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "1:1234567890:web:abcdef123456"
+        };
+
+        // Try load custom config from localStorage if present
+        const savedConfig = localStorage.getItem('custom_firebase_config');
+        if (savedConfig) {
+            try { firebaseConfig = JSON.parse(savedConfig); } catch(e) {}
+        }
+
+        let app, auth, db;
+        let isFirebaseInitialized = false;
+
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            isFirebaseInitialized = true;
+        } catch (e) {
+            console.warn("Firebase initialization skipped or in mock preview mode:", e);
+        }
+
+        // Global User State
+        window.currentUser = null;
+        window.userRole = 'student'; // 'student' or 'teacher'
+        window.studentApprovalStatus = 'pending'; // 'pending' or 'approved'
+        window.localPostersData = [];
+        window.localRegistrationsData = [];
+        window.localFeedbacksData = [];
+        window.selectedFeedbackPosterId = null;
+
+        // FAMOUS STARS DATABASE
+        const FAMOUS_STARS = [
+            { name: "태양 (Sun)", parallax: "N/A", distPc: "0.0000048 pc", distLy: "8.3 광분", apparentMag: "-26.74", absMag: "+4.83", desc: "우리에게 가장 가까운 주계열성 별로 태양계의 중심입니다." },
+            { name: "프록시마 센타우리", parallax: "0.768\"", distPc: "1.30 pc", distLy: "4.24 광년", apparentMag: "+11.05", absMag: "+15.49", desc: "태양 다음으로 가장 가까운 항성으로 적색왜성입니다." },
+            { name: "시리우스 (Sirius)", parallax: "0.379\"", distPc: "2.64 pc", distLy: "8.60 광년", apparentMag: "-1.46", absMag: "+1.43", desc: "밤하늘에서 가장 밝게 보이는 청백색 별입니다." },
+            { name: "베가 (Vega / 직녀성)", parallax: "0.130\"", distPc: "7.68 pc", distLy: "25.0 광년", apparentMag: "+0.03", absMag: "+0.58", desc: "거문고자리의 가장 밝은 별로 등급의 기준점으로 사용되었습니다." },
+            { name: "베텔게우스 (Betelgeuse)", parallax: "0.005\"", distPc: "197 pc", distLy: "642 광년", apparentMag: "+0.50", absMag: "-5.85", desc: "오리온자리의 적색초거성으로 수명이 얼마 남지 않은 별입니다." },
+            { name: "리겔 (Rigel)", parallax: "0.003\"", distPc: "260 pc", distLy: "860 광년", apparentMag: "+0.13", absMag: "-7.84", desc: "오리온자리의 청색초거성으로 광도가 매우 높습니다." }
+        ];
+
+        // INITIALIZATION ON LOAD
+        window.onload = function() {
+            renderFamousStars();
+            setupParallaxCanvas();
+            bindSimulatorSliders();
+            autoCalculatePosterValues();
+            updatePosterPreview();
+
+            // Set default date in poster preview
+            document.getElementById('prevTimestamp').innerText = new Date().toLocaleDateString('ko-KR');
+
+            // Firebase Auth Listener
+            if (isFirebaseInitialized && auth) {
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        window.currentUser = user;
+                        updateAuthUI(user);
+                        await checkUserRoleAndStatus(user.uid);
+                    } else {
+                        window.currentUser = null;
+                        updateAuthUI(null);
+                    }
+                });
+            } else {
+                // Mock initial logged-in student for instant playground
+                window.currentUser = { uid: "mock-student-123", displayName: "김과학 (학생)", email: "student@school.edu" };
+                updateAuthUI(window.currentUser);
+            }
+        };
+
+        // NAVIGATION ROUTER
+        window.navigateTo = function(targetView) {
+            document.getElementById('viewLanding').classList.add('hidden');
+            document.getElementById('viewStudent').classList.add('hidden');
+            document.getElementById('viewTeacher').classList.add('hidden');
+
+            if (targetView === 'landing') {
+                document.getElementById('viewLanding').classList.remove('hidden');
+            } else if (targetView === 'student') {
+                document.getElementById('viewStudent').classList.remove('hidden');
+            } else if (targetView === 'teacher') {
+                document.getElementById('viewTeacher').classList.remove('hidden');
+                verifyTeacherAccess();
+            }
+        };
+
+        window.enterAsRole = function(role) {
+            if (role === 'student') {
+                navigateTo('student');
+            } else if (role === 'teacher') {
+                navigateTo('teacher');
+            }
+        };
+
+        // AUTH HANDLERS
+        window.handleGoogleSignIn = async function() {
+            if (!isFirebaseInitialized || !auth) {
+                // Mock Login Toggle for Preview Environment
+                window.currentUser = {
+                    uid: "mock-teacher-456",
+                    displayName: "이선생 (교사)",
+                    email: "teacher@school.edu"
+                };
+                updateAuthUI(window.currentUser);
+                alert("시뮬레이션 모드로 로그인되었습니다: " + window.currentUser.displayName);
+                return;
+            }
+
+            const provider = new GoogleAuthProvider();
+            try {
+                const result = await signInWithPopup(auth, provider);
+                window.currentUser = result.user;
+                updateAuthUI(result.user);
+                await checkUserRoleAndStatus(result.user.uid);
+            } catch (error) {
+                console.error("Sign-in error:", error);
+                alert("구글 로그인 중 오류가 발생했습니다: " + error.message);
+            }
+        };
+
+        window.handleSignOut = async function() {
+            if (isFirebaseInitialized && auth) {
+                await signOut(auth);
+            }
+            window.currentUser = null;
+            updateAuthUI(null);
+            navigateTo('landing');
+        };
+
+        function updateAuthUI(user) {
+            const loginPromptBtn = document.getElementById('loginPromptBtn');
+            const userProfile = document.getElementById('userProfile');
+
+            if (user) {
+                loginPromptBtn.classList.add('hidden');
+                userProfile.classList.remove('hidden');
+                document.getElementById('userName').innerText = user.displayName || user.email.split('@')[0];
+                document.getElementById('userAvatar').src = user.photoURL || 'https://placehold.co/100x100/6366f1/ffffff?text=ST';
+                document.getElementById('posterStudentBadge').innerText = '작성자: ' + (user.displayName || '학생');
+            } else {
+                loginPromptBtn.classList.remove('hidden');
+                userProfile.classList.add('hidden');
+            }
+        }
+
+        // ROLE & APPROVAL STATUS CHECKER
+        async function checkUserRoleAndStatus(uid) {
+            if (!isFirebaseInitialized || !db) {
+                // In Mock Mode: Treat as teacher if email contains 'teacher'
+                if (window.currentUser && window.currentUser.email.includes('teacher')) {
+                    window.userRole = 'teacher';
+                } else {
+                    window.userRole = 'student';
+                    window.studentApprovalStatus = 'approved';
+                }
+                updateApprovalAlertUI();
+                return;
+            }
+
+            try {
+                // 1. Check Teacher Role Document
+                const roleRef = doc(db, 'artifacts', appId, 'public', 'data', 'roles', uid);
+                const roleSnap = await getDoc(roleRef);
+
+                if (roleSnap.exists() && roleSnap.data().role === 'teacher') {
+                    window.userRole = 'teacher';
+                    document.getElementById('userRoleBadge').innerText = '인증된 교사';
+                    document.getElementById('teacherEmailText').innerText = window.currentUser.email;
+                } else {
+                    window.userRole = 'student';
+                    document.getElementById('userRoleBadge').innerText = '학생 회원';
+                    
+                    // 2. Check Student Registration Request Status
+                    const regRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_registrations', uid);
+                    const regSnap = await getDoc(regRef);
+
+                    if (regSnap.exists()) {
+                        window.studentApprovalStatus = regSnap.data().status || 'pending';
+                    } else {
+                        window.studentApprovalStatus = 'unregistered';
+                    }
+                }
+                updateApprovalAlertUI();
+            } catch (e) {
+                console.error("Error checking role/status:", e);
+            }
+        }
+
+        function updateApprovalAlertUI() {
+            const alertBox = document.getElementById('registrationPendingAlert');
+            const statusText = document.getElementById('studentApprovalText');
+
+            if (window.userRole === 'teacher') {
+                alertBox.classList.add('hidden');
+                statusText.innerText = '교사 계정 (자동 승인)';
+                statusText.className = 'text-cyan-400 font-semibold';
+            } else if (window.studentApprovalStatus === 'approved') {
+                alertBox.classList.add('hidden');
+                statusText.innerText = '승인 완료';
+                statusText.className = 'text-emerald-400 font-semibold';
+            } else {
+                alertBox.classList.remove('hidden');
+                statusText.innerText = '승인 대기 중';
+                statusText.className = 'text-amber-400 font-semibold';
+            }
+        }
+
+        window.submitStudentRegistration = async function() {
+            const classInfo = document.getElementById('studentClassInput').value.trim();
+            if (!classInfo) {
+                alert('학급 및 번호 이름을 입력해주세요.');
+                return;
+            }
+
+            if (!window.currentUser) {
+                alert('로그인이 필요합니다.');
+                return;
+            }
+
+            const regData = {
+                studentUid: window.currentUser.uid,
+                studentName: window.currentUser.displayName || '학생',
+                studentEmail: window.currentUser.email,
+                classInfo: classInfo,
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+
+            if (isFirebaseInitialized && db) {
+                try {
+                    const regRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_registrations', window.currentUser.uid);
+                    await setDoc(regRef, regData);
+                    alert('교사에게 학급 수강 신청이 완료되었습니다.');
+                    window.studentApprovalStatus = 'pending';
+                    updateApprovalAlertUI();
+                } catch(e) {
+                    alert('신청 실패: ' + e.message);
+                }
+            } else {
+                window.localRegistrationsData.push(regData);
+                alert('시뮬레이션: 교사에게 승인 요청이 전달되었습니다.');
+                window.studentApprovalStatus = 'pending';
+                updateApprovalAlertUI();
+            }
+        };
+
+        // SUBTAB SWITCHING
+        window.switchStudentTab = function(tabName) {
+            document.getElementById('subTabExplore').classList.add('hidden');
+            document.getElementById('subTabFamous').classList.add('hidden');
+            document.getElementById('subTabPoster').classList.add('hidden');
+            document.getElementById('subTabMyFeedback').classList.add('hidden');
+
+            document.getElementById('tabBtnExplore').className = 'px-4 py-2 rounded-lg text-gray-400 hover:text-white';
+            document.getElementById('tabBtnFamous').className = 'px-4 py-2 rounded-lg text-gray-400 hover:text-white';
+            document.getElementById('tabBtnPoster').className = 'px-4 py-2 rounded-lg text-gray-400 hover:text-white';
+            document.getElementById('tabBtnMyFeedback').className = 'px-4 py-2 rounded-lg text-gray-400 hover:text-white';
+
+            if (tabName === 'explore') {
+                document.getElementById('subTabExplore').classList.remove('hidden');
+                document.getElementById('tabBtnExplore').className = 'px-4 py-2 rounded-lg bg-indigo-600 text-white';
+            } else if (tabName === 'famous') {
+                document.getElementById('subTabFamous').classList.remove('hidden');
+                document.getElementById('tabBtnFamous').className = 'px-4 py-2 rounded-lg bg-indigo-600 text-white';
+            } else if (tabName === 'poster') {
+                document.getElementById('subTabPoster').classList.remove('hidden');
+                document.getElementById('tabBtnPoster').className = 'px-4 py-2 rounded-lg bg-indigo-600 text-white';
+            } else if (tabName === 'myFeedback') {
+                document.getElementById('subTabMyFeedback').classList.remove('hidden');
+                document.getElementById('tabBtnMyFeedback').className = 'px-4 py-2 rounded-lg bg-indigo-600 text-white';
+                loadStudentFeedbackView();
+            }
+        };
+
+        // PARALLAX CANVAS SIMULATOR
+        function setupParallaxCanvas() {
+            const canvas = document.getElementById('parallaxCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            function resizeCanvas() {
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            let angle = 0;
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                const cx = canvas.width / 2;
+                const cy = canvas.height / 2 + 60;
+
+                // 1. Draw Sun at center
+                ctx.beginPath();
+                ctx.arc(cx, cy, 14, 0, Math.PI * 2);
+                ctx.fillStyle = '#F59E0B';
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = '#F59E0B';
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                // 2. Earth Orbit
+                const orbitR = 70;
+                ctx.beginPath();
+                ctx.arc(cx, cy, orbitR, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+                ctx.setLineDash([4, 4]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Earth Position
+                angle += 0.015;
+                const earthX1 = cx + Math.cos(angle) * orbitR;
+                const earthY1 = cy + Math.sin(angle) * orbitR * 0.4;
+
+                const earthX2 = cx + Math.cos(angle + Math.PI) * orbitR;
+                const earthY2 = cy + Math.sin(angle + Math.PI) * orbitR * 0.4;
+
+                // Draw Earth E1 & E2
+                ctx.beginPath();
+                ctx.arc(earthX1, earthY1, 6, 0, Math.PI * 2);
+                ctx.fillStyle = '#06B6D4';
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(earthX2, earthY2, 5, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(6, 182, 212, 0.5)';
+                ctx.fill();
+
+                // 3. Target Star Position
+                const distancePc = parseFloat(document.getElementById('distanceSlider').value);
+                const starY = cy - 80 - (distancePc * 15);
+
+                ctx.beginPath();
+                ctx.arc(cx, starY, 8, 0, Math.PI * 2);
+                ctx.fillStyle = '#6366F1';
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#6366F1';
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                // Light Sight Lines
+                ctx.beginPath();
+                ctx.moveTo(earthX1, earthY1);
+                ctx.lineTo(cx, starY);
+                ctx.moveTo(earthX2, earthY2);
+                ctx.lineTo(cx, starY);
+                ctx.strokeStyle = 'rgba(245, 158, 11, 0.4)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                requestAnimationFrame(draw);
+            }
+            draw();
+        }
+
+        // SIMULATOR SLIDERS
+        function bindSimulatorSliders() {
+            const distSlider = document.getElementById('distanceSlider');
+            distSlider.addEventListener('input', (e) => {
+                const pc = parseFloat(e.target.value);
+                const ly = (pc * 3.26156).toFixed(2);
+                const parallax = (1 / pc).toFixed(3);
+                const auRatio = Math.round(pc * 206265).toLocaleString();
+
+                document.getElementById('distanceValText').innerText = `${pc.toFixed(2)} pc (${ly} 광년)`;
+                document.getElementById('calculatedParallaxText').innerText = `${parallax}"`;
+                document.getElementById('calculatedPcText').innerText = `${pc.toFixed(2)} pc`;
+                document.getElementById('calculatedAuText').innerText = `${auRatio} 배`;
+            });
+
+            const apparentSlider = document.getElementById('apparentSlider');
+            const magDistSlider = document.getElementById('magDistSlider');
+
+            function updateMagnitudeCalc() {
+                const m = parseFloat(apparentSlider.value);
+                const d = parseFloat(magDistSlider.value);
+
+                // m - M = 5 log10(d) - 5 => M = m - 5 log10(d) + 5
+                const M = m - (5 * Math.log10(d)) + 5;
+
+                document.getElementById('apparentValText').innerText = `${m.toFixed(1)} 등급`;
+                document.getElementById('magDistValText').innerText = `${d.toFixed(0)} pc`;
+                document.getElementById('calculatedAbsMag').innerText = `${M > 0 ? '+' : ''}${M.toFixed(2)} 등급`;
+
+                const notice = document.getElementById('distanceStatusNotice');
+                if (d < 10) {
+                    notice.innerText = `현재 거리: ${d}pc (지구에 가까워 겉보기등급이 절대등급보다 밝게 작음)`;
+                    notice.className = "text-[11px] text-center text-amber-300 font-semibold pt-1";
+                } else if (d === 10) {
+                    notice.innerText = `현재 거리: 10pc (겉보기등급 = 절대등급 동일)`;
+                    notice.className = "text-[11px] text-center text-cyan-300 font-semibold pt-1";
+                } else {
+                    notice.innerText = `현재 거리: ${d}pc (10pc보다 멀어 겉보기등급이 절대등급보다 어둡게 큼)`;
+                    notice.className = "text-[11px] text-center text-indigo-300 font-semibold pt-1";
+                }
+            }
+
+            apparentSlider.addEventListener('input', updateMagnitudeCalc);
+            magDistSlider.addEventListener('input', updateMagnitudeCalc);
+        }
+
+        // RENDER FAMOUS STARS
+        function renderFamousStars() {
+            const grid = document.getElementById('famousStarsGrid');
+            if (!grid) return;
+
+            grid.innerHTML = FAMOUS_STARS.map(star => `
+                <div class="glass-panel p-4 rounded-xl border border-gray-800 space-y-2 hover:border-indigo-500/50 transition">
+                    <div class="flex justify-between items-start">
+                        <h5 class="font-bold text-white text-sm">${star.name}</h5>
+                        <span class="px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 text-[10px] font-bold">시차: ${star.parallax}</span>
+                    </div>
+                    <p class="text-[11px] text-gray-400 leading-snug">${star.desc}</p>
+                    <div class="grid grid-cols-2 gap-2 text-[10px] pt-2 border-t border-gray-800">
+                        <div><span class="text-gray-500">지구 거리:</span> <strong class="text-cyan-300">${star.distPc}</strong></div>
+                        <div><span class="text-gray-500">광년 거리:</span> <strong class="text-indigo-300">${star.distLy}</strong></div>
+                        <div><span class="text-gray-500">겉보기등급:</span> <strong class="text-amber-300">${star.apparentMag}</strong></div>
+                        <div><span class="text-gray-500">절대등급:</span> <strong class="text-amber-400">${star.absMag}</strong></div>
+                    </div>
+                    <button onclick="applyStarToPoster('${star.name}', '${star.parallax}', '${star.apparentMag}', '${star.desc}')" class="w-full mt-2 py-1.5 bg-gray-800 hover:bg-gray-700 text-indigo-300 text-[11px] font-semibold rounded-lg transition border border-gray-700">
+                        이 별로 포스터 작성하기
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        window.applyStarToPoster = function(name, parallaxStr, apparentMagStr, desc) {
+            document.getElementById('pStarName').value = name;
+            let numericP = parseFloat(parallaxStr);
+            if (isNaN(numericP)) numericP = 0.5;
+            document.getElementById('pParallax').value = numericP;
+            document.getElementById('pApparentMag').value = parseFloat(apparentMagStr) || 1.0;
+            document.getElementById('pDescription').value = desc;
+
+            autoCalculatePosterValues();
+            updatePosterPreview();
+            switchStudentTab('poster');
+        };
+
+        // POSTER PREVIEW & CALCULATIONS
+        window.autoCalculatePosterValues = function() {
+            const p = parseFloat(document.getElementById('pParallax').value) || 0.1;
+            const m = parseFloat(document.getElementById('pApparentMag').value) || 1.0;
+
+            const dPc = 1 / p;
+            const dLy = dPc * 3.26156;
+            const M = m - (5 * Math.log10(dPc)) + 5;
+            const auRatio = Math.round(dPc * 206265);
+
+            document.getElementById('autoPosterDist').innerText = `${dPc.toFixed(2)} pc (${dLy.toFixed(2)} 광년)`;
+            document.getElementById('autoPosterAbsMag').innerText = `${M > 0 ? '+' : ''}${M.toFixed(2)} 등급`;
+            document.getElementById('pAuRatio').value = `${auRatio.toLocaleString()} 배`;
+
+            updatePosterPreview();
+        };
+
+        window.updatePosterPreview = function() {
+            const starName = document.getElementById('pStarName').value || '나만의 별';
+            const p = parseFloat(document.getElementById('pParallax').value) || 0.1;
+            const m = parseFloat(document.getElementById('pApparentMag').value) || 1.0;
+            const desc = document.getElementById('pDescription').value;
+            const theme = document.getElementById('pTheme').value;
+
+            const dPc = (1 / p).toFixed(2);
+            const M = (m - (5 * Math.log10(1 / p)) + 5).toFixed(2);
+            const auRatio = Math.round((1 / p) * 206265).toLocaleString();
+
+            document.getElementById('prevStarName').innerText = starName;
+            document.getElementById('prevParallax').innerText = `${p}"`;
+            document.getElementById('prevDistance').innerText = `${dPc} pc`;
+            document.getElementById('prevApparent').innerText = `${m} 등급`;
+            document.getElementById('prevAbsolute').innerText = `${M > 0 ? '+' : ''}${M} 등급`;
+            document.getElementById('prevAuRatio').innerText = `${auRatio} 배`;
+            document.getElementById('prevDescription').innerText = desc;
+
+            const poster = document.getElementById('posterCanvasTarget');
+            poster.className = "w-full max-w-md aspect-[3/4] rounded-2xl p-6 flex flex-col justify-between shadow-2xl relative border-2 border-indigo-500/30 overflow-hidden transition-all duration-300 " + getThemeBg(theme);
+        };
+
+        function getThemeBg(theme) {
+            switch(theme) {
+                case 'theme-gold': return 'bg-gradient-to-b from-amber-950 via-gray-900 to-black';
+                case 'theme-nebula': return 'bg-gradient-to-b from-purple-950 via-slate-900 to-black';
+                case 'theme-cyan': return 'bg-gradient-to-b from-teal-950 via-slate-900 to-black';
+                default: return 'bg-gradient-to-b from-slate-900 via-indigo-950 to-black';
+            }
+        }
+
+        // POSTER SUBMISSION TO TEACHER
+        window.submitPosterToTeacher = async function() {
+            if (!window.currentUser) {
+                alert('로그인이 필요한 기능입니다.');
+                return;
+            }
+
+            const p = parseFloat(document.getElementById('pParallax').value) || 0.1;
+            const m = parseFloat(document.getElementById('pApparentMag').value) || 1.0;
+            const dPc = (1 / p).toFixed(2);
+            const M = (m - (5 * Math.log10(1 / p)) + 5).toFixed(2);
+
+            const posterData = {
+                studentUid: window.currentUser.uid,
+                studentName: window.currentUser.displayName || '학생',
+                starName: document.getElementById('pStarName').value,
+                parallax: p,
+                apparentMag: m,
+                distancePc: dPc,
+                absoluteMag: M,
+                auRatio: document.getElementById('pAuRatio').value,
+                description: document.getElementById('pDescription').value,
+                theme: document.getElementById('pTheme').value,
+                createdAt: new Date().toISOString()
+            };
+
+            if (isFirebaseInitialized && db) {
+                try {
+                    const posterRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'posters'));
+                    await setDoc(posterRef, posterData);
+                    alert('성공적으로 선생님께 나만의 별 포스터를 제출하였습니다!');
+                } catch(e) {
+                    alert('제출 실패: ' + e.message);
+                }
+            } else {
+                window.localPostersData.push(posterData);
+                alert('시뮬레이션: 교사 대시보드 제출함으로 저장되었습니다.');
+            }
+        };
+
+        // TEACHER DASHBOARD LOGIC
+        function verifyTeacherAccess() {
+            const deniedBox = document.getElementById('teacherAccessDenied');
+            const mainContent = document.getElementById('teacherMainContent');
+
+            if (window.userRole === 'teacher') {
+                deniedBox.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+                loadTeacherDashboardData();
+            } else {
+                deniedBox.classList.remove('hidden');
+                mainContent.classList.add('hidden');
+            }
+        }
+
+        async function loadTeacherDashboardData() {
+            if (isFirebaseInitialized && db) {
+                // Fetch Pending Student Registrations
+                const regQuery = query(collection(db, 'artifacts', appId, 'public', 'data', 'student_registrations'));
+                onSnapshot(regQuery, (snapshot) => {
+                    const regs = [];
+                    snapshot.forEach(doc => regs.push({ id: doc.id, ...doc.data() }));
+                    renderTeacherRegistrationsTable(regs);
+                }, (err) => console.error(err));
+
+                // Fetch Submitted Posters
+                const posterQuery = query(collection(db, 'artifacts', appId, 'public', 'data', 'posters'));
+                onSnapshot(posterQuery, (snapshot) => {
+                    const posters = [];
+                    snapshot.forEach(doc => posters.push({ id: doc.id, ...doc.data() }));
+                    window.localPostersData = posters;
+                    renderTeacherPostersGrid(posters);
+                }, (err) => console.error(err));
+            } else {
+                // Render Local Simulation Data
+                renderTeacherRegistrationsTable(window.localRegistrationsData);
+                renderTeacherPostersGrid(window.localPostersData);
+            }
+        }
+
+        function renderTeacherRegistrationsTable(regs) {
+            const tbody = document.getElementById('studentApprovalTableBody');
+            const pendingBadge = document.getElementById('pendingCountBadge');
+
+            const pending = regs.filter(r => r.status === 'pending');
+            pendingBadge.innerText = `${pending.length}명 대기`;
+
+            if (regs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500">등록 신청한 학생이 없습니다.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = regs.map(r => `
+                <tr>
+                    <td class="p-2 font-bold text-white">${r.studentName} <div class="text-[10px] font-normal text-gray-400">${r.studentEmail || ''}</div></td>
+                    <td class="p-2 text-cyan-300">${r.classInfo || '학급 정보 미입력'}</td>
+                    <td class="p-2 text-gray-400">${new Date(r.createdAt).toLocaleDateString()}</td>
+                    <td class="p-2 text-right space-x-1">
+                        ${r.status === 'approved' 
+                            ? `<span class="px-2 py-1 bg-emerald-950 text-emerald-300 rounded text-[10px] font-bold">승인 완료</span>` 
+                            : `<button onclick="approveStudentRequest('${r.studentUid || r.id}')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-bold transition">승인하기</button>`
+                        }
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        window.approveStudentRequest = async function(uid) {
+            if (isFirebaseInitialized && db) {
+                try {
+                    const regRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_registrations', uid);
+                    await updateDoc(regRef, { status: 'approved' });
+                    alert('학생 수강 신청을 승인하였습니다.');
+                } catch(e) {
+                    alert('승인 처리 실패: ' + e.message);
+                }
+            } else {
+                const target = window.localRegistrationsData.find(r => (r.studentUid === uid || r.id === uid));
+                if (target) target.status = 'approved';
+                alert('시뮬레이션: 학생 수강이 승인되었습니다.');
+                loadTeacherDashboardData();
+            }
+        };
+
+        function renderTeacherPostersGrid(posters) {
+            const grid = document.getElementById('teacherPostersGrid');
+            if (!grid) return;
+
+            if (posters.length === 0) {
+                grid.innerHTML = `<div class="col-span-full p-8 text-center text-gray-500 glass-panel rounded-xl">제출된 포스터가 아직 없습니다.</div>`;
+                return;
+            }
+
+            grid.innerHTML = posters.map(p => `
+                <div class="glass-panel p-4 rounded-xl border border-gray-800 space-y-3 hover:border-cyan-500/60 transition">
+                    <div class="flex justify-between items-start border-b border-gray-800 pb-2">
+                        <div>
+                            <span class="text-[10px] text-gray-400">학생: ${p.studentName}</span>
+                            <h5 class="font-bold text-white text-sm">${p.starName}</h5>
+                        </div>
+                        <span class="px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 text-[10px] font-bold">${p.distancePc} pc</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-1 text-[10px]">
+                        <div><span class="text-gray-500">연주시차:</span> <strong class="text-cyan-300">${p.parallax}"</strong></div>
+                        <div><span class="text-gray-500">겉보기등급:</span> <strong class="text-amber-300">${p.apparentMag}</strong></div>
+                        <div><span class="text-gray-500">절대등급:</span> <strong class="text-amber-400">${p.absoluteMag}</strong></div>
+                        <div><span class="text-gray-500">태양-지구비:</span> <strong class="text-indigo-300">${p.auRatio}</strong></div>
+                    </div>
+
+                    <button onclick="openFeedbackModal('${p.id || p.studentUid}', '${p.studentName}', '${p.starName}')" class="w-full py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-lg transition shadow-md shadow-cyan-950">
+                        1:1 피드백 작성 및 평가하기
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        window.openFeedbackModal = function(posterId, studentName, starName) {
+            window.selectedFeedbackPosterId = posterId;
+            document.getElementById('modalStudentInfo').innerText = studentName;
+            document.getElementById('modalStarName').innerText = starName;
+            document.getElementById('feedbackModal').classList.remove('hidden');
+        };
+
+        window.closeFeedbackModal = function() {
+            document.getElementById('feedbackModal').classList.add('hidden');
+        };
+
+        window.saveTeacherFeedback = async function() {
+            const grade = document.getElementById('fGrade').value;
+            const comment = document.getElementById('fComment').value.trim();
+
+            if (!comment) {
+                alert('피드백 내용을 입력해주세요.');
+                return;
+            }
+
+            const poster = window.localPostersData.find(p => p.id === window.selectedFeedbackPosterId || p.studentUid === window.selectedFeedbackPosterId);
+            const studentUid = poster ? poster.studentUid : window.selectedFeedbackPosterId;
+
+            const feedbackData = {
+                posterId: window.selectedFeedbackPosterId,
+                studentUid: studentUid,
+                teacherUid: window.currentUser ? window.currentUser.uid : 'teacher-123',
+                grade: grade,
+                comment: comment,
+                createdAt: new Date().toISOString()
+            };
+
+            if (isFirebaseInitialized && db) {
+                try {
+                    const fbRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'feedbacks'));
+                    await setDoc(fbRef, feedbackData);
+                    alert('피드백이 저장되고 학생에게 전달되었습니다.');
+                    closeFeedbackModal();
+                } catch(e) {
+                    alert('피드백 저장 실패: ' + e.message);
+                }
+            } else {
+                window.localFeedbacksData.push(feedbackData);
+                alert('시뮬레이션: 학생에게 피드백이 등록되었습니다.');
+                closeFeedbackModal();
+            }
+        };
+
+        async function loadStudentFeedbackView() {
+            const container = document.getElementById('myFeedbackContainer');
+            if (!container) return;
+
+            if (!window.currentUser) {
+                container.innerHTML = `<p class="text-xs text-gray-400 text-center py-8">로그인 후 피드백을 확인할 수 있습니다.</p>`;
+                return;
+            }
+
+            if (isFirebaseInitialized && db) {
+                const fbQuery = query(collection(db, 'artifacts', appId, 'public', 'data', 'feedbacks'));
+                onSnapshot(fbQuery, (snapshot) => {
+                    const myFbList = [];
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        if (data.studentUid === window.currentUser.uid) {
+                            myFbList.push(data);
+                        }
+                    });
+                    renderMyFeedbacks(myFbList);
+                }, (err) => console.error(err));
+            } else {
+                const myFbList = window.localFeedbacksData.filter(f => f.studentUid === window.currentUser.uid);
+                renderMyFeedbacks(myFbList);
+            }
+        }
+
+        function renderMyFeedbacks(list) {
+            const container = document.getElementById('myFeedbackContainer');
+            if (list.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-400 text-center py-8">아직 제출한 포스터에 대한 교사 피드백이 등록되지 않았습니다.</p>`;
+                return;
+            }
+
+            container.innerHTML = list.map(f => `
+                <div class="bg-gray-900/90 p-4 rounded-xl border border-indigo-500/40 space-y-2">
+                    <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                        <span class="px-2.5 py-1 bg-amber-950 text-amber-300 font-extrabold rounded text-xs border border-amber-800">평가 등급: ${f.grade}</span>
+                        <span class="text-[10px] text-gray-400">${new Date(f.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <div class="text-xs text-gray-200 leading-relaxed pt-1">
+                        <strong class="text-indigo-300 block mb-1">선생님의 지도의견:</strong>
+                        ${f.comment}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // MODAL TOGGLES & HELPERS
+        window.openConfigModal = function() {
+            document.getElementById('configModal').classList.remove('hidden');
+        };
+
+        window.closeConfigModal = function() {
+            document.getElementById('configModal').classList.add('hidden');
+        };
+
+        window.copySecurityRules = function() {
+            const rules = document.getElementById('securityRulesCode').innerText;
+            navigator.clipboard.writeText(rules).then(() => {
+                alert('Firestore Security Rules가 클립보드에 복사되었습니다!');
+            }).catch(() => {
+                alert('복사에 실패했습니다. 직접 드래그하여 복사하세요.');
+            });
+        };
+
+        window.saveCustomFirebaseConfig = function() {
+            const jsonText = document.getElementById('firebaseConfigJson').value.trim();
+            try {
+                const parsed = JSON.parse(jsonText);
+                localStorage.setItem('custom_firebase_config', JSON.stringify(parsed));
+                alert('Custom Firebase 설정이 저장되었습니다. 페이지를 새로고침합니다.');
+                location.reload();
+            } catch(e) {
+                alert('올바른 JSON 형식이 아닙니다.');
+            }
+        };
+
+        // Expose functions globally
+        window.filterTeacherPosters = function() {
+            const queryText = document.getElementById('teacherSearchStudent').value.toLowerCase();
+            const filtered = window.localPostersData.filter(p => p.studentName.toLowerCase().includes(queryText) || p.starName.toLowerCase().includes(queryText));
+            renderTeacherPostersGrid(filtered);
+        };
+    </script>
+</body>
+</html>
